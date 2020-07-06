@@ -1,16 +1,14 @@
-include(FindPkgConfig)
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(LIBEXIF REQUIRED libexif)
-
-add_executable(indexer indexer.cpp)
-set_target_properties(indexer PROPERTIES
+add_executable(iu
+  find.cpp
+  index.cpp
+  main.cpp
+)
+set_target_properties(iu PROPERTIES
   CXX_STANDARD 17
 )
-target_link_libraries(indexer xapian)
-target_link_libraries(indexer ${LIBEXIF_LIBRARIES})
+target_link_libraries(iu xapian)
+target_link_libraries(iu ${LIBEXIF_LIBRARIES})
 
-add_executable(search search.cpp)
-set_target_properties(search PROPERTIES
-  CXX_STANDARD 17
-)
-target_link_libraries(search xapian)
+include_directories(${CLI11_SOURCE_DIR}/include)
+include_directories(${spdlog_SOURCE_DIR}/include)
+include_directories(${nanoflann_SOURCE_DIR}/include)
