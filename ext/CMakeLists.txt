@@ -24,5 +24,4 @@ FetchContent_MakeAvailable(nanoflann)
 
 include(FindPkgConfig)
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(LIBEXIF REQUIRED libexif)
-
+pkg_check_modules(LIBEXIV2 REQUIRED exiv2)

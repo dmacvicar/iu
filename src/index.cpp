@@ -5,9 +5,7 @@
 #include <tuple>
 #include <filesystem>
 
-#include <libexif/exif-data.h>
-#include <libexif/exif-tag.h>
-#include <libexif/exif-utils.h>
+#include <exiv2/exiv2.hpp>
 
 #include <spdlog/spdlog.h>
 
@@ -15,57 +13,18 @@
 
 constexpr auto INDEX_PATH = "./index_data";
 constexpr auto F_DOCID = 1;
-constexpr auto BUFFER_SIZE = 255;
 
 namespace fs = std::filesystem;
 
-static std::optional<float> exifentry_to_degrees(ExifEntry *exifEntry)
+static int index_file(Xapian::TermGenerator &indexer, const Exiv2::ExifData &exifData)
 {
-    if (exifEntry == nullptr || exifEntry->format != EXIF_FORMAT_RATIONAL) {
-        return std::nullopt;
-    }
-
-    ExifByteOrder order = exif_data_get_byte_order(exifEntry->parent->parent);
-    // http://www.opanda.com/en/pe/help/gps.html#GPSLatitude
-    if (exifEntry->components == 3) {
-        // When degrees, minutes and seconds are expressed, the format is dd/1,mm/1,ss/1
-        auto degrees = exif_get_rational(exifEntry->data, order).numerator;
-        auto minutes = exif_get_rational(exifEntry->data + sizeof(ExifRational), order).numerator;
-        auto seconds = exif_get_rational(exifEntry->data + 2*sizeof(ExifRational), order).numerator;
-
-        std::cout << degrees << minutes << seconds << std::endl;
-        return degrees + (minutes/60.0) + (seconds/3600.0);
-    }
-
-    // not sure how to handle less components yet
-    return std::nullopt;
-}
-
-static int index_file(Xapian::TermGenerator &indexer, ExifData *exifData)
-{
-    static char buf[BUFFER_SIZE];
-    {
-        for (auto tag: {EXIF_TAG_MAKE, EXIF_TAG_MODEL}) {
-            ExifEntry *exifEntry = exif_data_get_entry(exifData, tag);
-            if (exifEntry == nullptr) {
-                continue;
-            }
-            const char * val = exif_entry_get_value(exifEntry, buf, BUFFER_SIZE);
-            // C: camera
-            indexer.index_text(val, 1, "C");
-            exif_entry_unref(exifEntry);
+    static Exiv2::ExifKey EXIF_TAG_MAKE("Exif.Image.Make");
+    static Exiv2::ExifKey EXIF_TAG_MODEL("Exif.Image.Model");
+    for (auto key: {EXIF_TAG_MAKE, EXIF_TAG_MODEL}) {
+        Exiv2::ExifData::const_iterator pos = exifData.findKey(key);
+        if (pos != exifData.end()) {
+            indexer.index_text(pos->toString(), 1, "C");
         }
-    }
-    return 0;
-    {
-        ExifEntry *exifEntry = exif_data_get_entry(exifData, (ExifTag) EXIF_TAG_GPS_LATITUDE);
-        auto lat = exifentry_to_degrees(exifEntry);
-        if (lat) {
-            std::cout << "GPS Lat: " << lat.value() << std::endl;
-        } else {
-            std::cout << "No GPS Lat: " << std::endl;
-        }
-        exif_entry_unref(exifEntry);
     }
     return 0;
 }
@@ -89,18 +48,22 @@ int iu_index_directory_recursive(const std::string &root)
         indexer.set_document(doc);
         doc.add_value(F_DOCID, p.path().string());
 
-        ExifData *exifData = exif_data_new_from_file(p.path().c_str());
-        if (!exifData) {
-            spdlog::error("Failed to load {}", p.path().string());
-            failed_count++;
+        try {
+            auto image = Exiv2::ImageFactory::open(p.path().string());
+            if (image.get() == nullptr) {
+                spdlog::error("Failed to load {}", p.path().string());
+            }
+
+            image->readMetadata();
+            Exiv2::ExifData &exifData = image->exifData();
+            if (exifData.empty()) {
+                spdlog::error("No EXIF metadata for {}", p.path().string());
+            }
+            index_file(indexer, exifData);
+        } catch (Exiv2::Error &e) {
+            spdlog::error(e.what());
             continue;
         }
-        exif_data_fix(exifData);
-        exif_data_dump(exifData);
-
-        index_file(indexer, exifData);
-
-        exif_data_unref(exifData);
 
         std::string idterm("Q" + p.path().string());
         doc.add_boolean_term(idterm);
