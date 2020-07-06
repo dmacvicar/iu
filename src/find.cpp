@@ -29,7 +29,7 @@ int iu_search(const std::string &query_str)
         }
 
     } catch(const Xapian::Error e) {
-        std::cout << e.get_description() << std::endl;
+        std::cerr << e.get_description() << std::endl;
         return -1;
     }
     return 0;
