@@ -1,21 +1,22 @@
-#include <xapian.h>
 #include <iostream>
 #include <string>
 
-#include "spdlog/spdlog.h"
+#include <spdlog/spdlog.h>
+#include <xapian.h>
 
-#define QUERY "camera:F5321"
-#define INDEX_PATH "./index_data"
-#define F_DOCID 1
+constexpr auto INDEX_PATH = "./index_data";
+constexpr auto F_DOCID = 1;
 
 int iu_search(const std::string &query_str)
 {
     try {
-        Xapian::Database db(std::string(INDEX_PATH));
+        std::string path(INDEX_PATH);
+        Xapian::Database db(path);
         Xapian::Enquire enquire(db);
 
         Xapian::QueryParser qp;
         qp.add_prefix("camera", "C");
+        qp.add_prefix("file", "Q");
         Xapian::Query query = qp.parse_query(query_str);
         spdlog::debug("Query: {}", query.get_description());
 

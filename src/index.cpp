@@ -1,21 +1,21 @@
-#include <xapian.h>
-
 #include <algorithm>
-#include <libexif/exif-data.h>
-#include <libexif/exif-tag.h>
-#include <libexif/exif-utils.h>
-
 #include <iostream>
 #include <optional>
 #include <string>
 #include <tuple>
 #include <filesystem>
 
-#include "spdlog/spdlog.h"
+#include <libexif/exif-data.h>
+#include <libexif/exif-tag.h>
+#include <libexif/exif-utils.h>
 
-#define INDEX_PATH "./index_data"
-#define F_DOCID 1
-#define BUFFER_SIZE 255
+#include <spdlog/spdlog.h>
+
+#include <xapian.h>
+
+constexpr auto INDEX_PATH = "./index_data";
+constexpr auto F_DOCID = 1;
+constexpr auto BUFFER_SIZE = 255;
 
 namespace fs = std::filesystem;
 
@@ -56,7 +56,7 @@ static int index_file(Xapian::TermGenerator &indexer, ExifData *exifData)
             exif_entry_unref(exifEntry);
         }
     }
-
+    return 0;
     {
         ExifEntry *exifEntry = exif_data_get_entry(exifData, (ExifTag) EXIF_TAG_GPS_LATITUDE);
         auto lat = exifentry_to_degrees(exifEntry);
@@ -74,6 +74,7 @@ int iu_index_directory_recursive(const std::string &root)
 {
     Xapian::WritableDatabase db(std::string(INDEX_PATH), Xapian::DB_CREATE_OR_OPEN);
     Xapian::TermGenerator indexer;
+    int failed_count = 0;
 
     for (auto& p: fs::recursive_directory_iterator(root)) {
         std::string ext(p.path().extension());
@@ -89,15 +90,27 @@ int iu_index_directory_recursive(const std::string &root)
         doc.add_value(F_DOCID, p.path().string());
 
         ExifData *exifData = exif_data_new_from_file(p.path().c_str());
+        if (!exifData) {
+            spdlog::error("Failed to load {}", p.path().string());
+            failed_count++;
+            continue;
+        }
+        exif_data_fix(exifData);
         exif_data_dump(exifData);
 
         index_file(indexer, exifData);
 
         exif_data_unref(exifData);
 
-        db.add_document(doc);
+        std::string idterm("Q" + p.path().string());
+        doc.add_boolean_term(idterm);
+        db.replace_document(idterm, doc);
     }
     db.commit();
+    std::cout << "indexed: " << db.get_doccount() << " files" << std::endl;
+    if (failed_count > 0) {
+        std::cout << "failed: " << failed_count << " files" << std::endl;
+    }
     return 0;
 }
 
