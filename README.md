@@ -17,3 +17,7 @@ Probably using a database like this one:
 * https://github.com/richardpenman/reverse_geocode
 * https://raw.githubusercontent.com/richardpenman/reverse_geocode/master/geocode.csv
 * https://raw.githubusercontent.com/richardpenman/reverse_geocode/master/countries.csv
+
+## Misc
+
+- [ ] Collect files that failed to index
