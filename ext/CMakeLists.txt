@@ -2,6 +2,9 @@ include(FetchContent)
 
 FetchContent_Declare(cli11
   GIT_REPOSITORY https://github.com/CLIUtils/CLI11
+  GIT_SHALLOW ON
+  EXCLUDE_FROM_ALL ON
+  EXCLUDE_FROM_MAIN TRUE
 )
 FetchContent_MakeAvailable(cli11)
 
@@ -13,6 +16,9 @@ FetchContent_MakeAvailable(spdlog)
 
 FetchContent_Declare(nanoflann
   GIT_REPOSITORY https://github.com/jlblancoc/nanoflann.git
+  GIT_SHALLOW ON
+  EXCLUDE_FROM_ALL ON
+  EXCLUDE_FROM_MAIN TRUE
 )
 FetchContent_MakeAvailable(nanoflann)
 
