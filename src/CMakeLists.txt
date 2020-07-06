@@ -1,3 +1,10 @@
+if(TIDY)
+  set(CMAKE_CXX_CLANG_TIDY
+    clang-tidy;
+    -header-filter=.;
+    -checks=cppcoreguidelines-*, portability-*, readability-*;)
+endif()
+  
 add_executable(iu
   find.cpp
   index.cpp
