@@ -43,16 +43,18 @@ static std::optional<float> exifentry_to_degrees(ExifEntry *exifEntry)
 
 static int index_file(Xapian::TermGenerator &indexer, ExifData *exifData)
 {
+    static char buf[BUFFER_SIZE];
     {
-        ExifEntry *exifEntry = exif_data_get_entry(exifData, EXIF_TAG_MODEL);
-        if (exifEntry != nullptr) {
-            char buf[255];
-            const char * val = exif_entry_get_value(exifEntry, buf, 255);
+        for (auto tag: {EXIF_TAG_MAKE, EXIF_TAG_MODEL}) {
+            ExifEntry *exifEntry = exif_data_get_entry(exifData, tag);
+            if (exifEntry == nullptr) {
+                continue;
+            }
+            const char * val = exif_entry_get_value(exifEntry, buf, BUFFER_SIZE);
             // C: camera
             indexer.index_text(val, 1, "C");
-            std::cout << "Model: " << val << std::endl;
+            exif_entry_unref(exifEntry);
         }
-        exif_entry_unref(exifEntry);
     }
 
     {
