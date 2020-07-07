@@ -3,8 +3,6 @@ include(FetchContent)
 FetchContent_Declare(cli11
   GIT_REPOSITORY https://github.com/CLIUtils/CLI11
   GIT_SHALLOW ON
-  EXCLUDE_FROM_ALL ON
-  EXCLUDE_FROM_MAIN TRUE
 )
 FetchContent_MakeAvailable(cli11)
 
@@ -24,4 +22,10 @@ FetchContent_MakeAvailable(nanoflann)
 
 include(FindPkgConfig)
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(LIBEXIV2 REQUIRED exiv2)
+if(IMAGE_METADATA_BACKEND STREQUAL "exiv2")
+  pkg_check_modules(LIBEXIV2 REQUIRED exiv2)
+elseif (IMAGE_METADATA_BACKEND STREQUAL "libexif")
+  pkg_check_modules(LIBEXIF REQUIRED libexif)
+else()
+  message(FATAL_ERROR "Unsupported metadata backend: ${IMAGE_METADATA_BACKEND}")
+endif()

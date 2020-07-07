@@ -4,17 +4,27 @@ if(TIDY)
     -header-filter=.;
     -checks=cppcoreguidelines-*, portability-*, readability-*;)
 endif()
-  
-add_executable(iu
+
+set(iu_SOURCES
   find.cpp
   index.cpp
+  index_${IMAGE_METADATA_BACKEND}.cpp
   main.cpp
+  )
+
+add_executable(iu
+  ${iu_SOURCES}
 )
 set_target_properties(iu PROPERTIES
   CXX_STANDARD 17
 )
 target_link_libraries(iu xapian)
-target_link_libraries(iu ${LIBEXIV2_LIBRARIES})
+
+if(IMAGE_METADATA_BACKEND STREQUAL "exiv2")
+  target_link_libraries(iu ${LIBEXIV2_LIBRARIES})
+elseif (IMAGE_METADATA_BACKEND STREQUAL "libexif")
+  target_link_libraries(iu ${LIBEXIF_LIBRARIES})
+endif()
 
 include_directories(${CLI11_SOURCE_DIR}/include)
 include_directories(${spdlog_SOURCE_DIR}/include)
