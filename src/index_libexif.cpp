@@ -9,7 +9,7 @@
 
 #include <xapian.h>
 
-constexpr auto BUFFER_SIZE = 255;
+constexpr auto BUFFER_SIZE = 2000;
 
 namespace fs = std::filesystem;
 
