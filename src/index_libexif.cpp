@@ -52,7 +52,6 @@ static int index_exif_data(Xapian::TermGenerator &indexer, ExifData *exifData)
 
             // C: camera
             indexer.index_text(val, 1, "C");
-            exif_entry_unref(exifEntry);
         }
     }
     return 0;
@@ -64,7 +63,6 @@ static int index_exif_data(Xapian::TermGenerator &indexer, ExifData *exifData)
         } else {
             spdlog::debug("No GPS Lat");
         }
-        exif_entry_unref(exifEntry);
     }
     return 0;
 }
@@ -82,11 +80,11 @@ int iu_index_file(Xapian::TermGenerator &indexer, const fs::path &p)
     auto ret = index_exif_data(indexer, exifData);
     if (ret != 0) {
         spdlog::error("Failed to index {}", p.string());
+        exif_data_unref(exifData);
         return -1;
     }
 
-    // FIXME, still crashes on a bunch of photos
-    //exif_data_unref(exifData);
+    exif_data_unref(exifData);
     return 0;
 }
 
