@@ -44,7 +44,12 @@ static int index_exif_data(Xapian::TermGenerator &indexer, ExifData *exifData)
                 spdlog::debug("Can't get exif entry for tag {}", exif_tag_get_name(tag));;
                 continue;
             }
-            const char * val = exif_entry_get_value(exifEntry, buf, BUFFER_SIZE);
+            const char * val = exif_entry_get_value(exifEntry, buf, sizeof(buf));
+            if (val == nullptr) {
+                spdlog::debug("Can't get value from entry for tag {}", exif_tag_get_name(tag));
+                continue;
+            }
+
             // C: camera
             indexer.index_text(val, 1, "C");
             exif_entry_unref(exifEntry);
