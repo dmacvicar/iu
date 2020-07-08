@@ -41,6 +41,7 @@ static int index_exif_data(Xapian::TermGenerator &indexer, ExifData *exifData)
         for (auto tag: {EXIF_TAG_MAKE, EXIF_TAG_MODEL}) {
             ExifEntry *exifEntry = exif_data_get_entry(exifData, tag);
             if (exifEntry == nullptr) {
+                spdlog::debug("Can't get exif entry for tag {}", exif_tag_get_name(tag));;
                 continue;
             }
             const char * val = exif_entry_get_value(exifEntry, buf, BUFFER_SIZE);
