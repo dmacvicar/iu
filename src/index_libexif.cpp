@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include <string>
 #include <filesystem>
 
@@ -13,55 +14,87 @@ constexpr auto BUFFER_SIZE = 2000;
 
 namespace fs = std::filesystem;
 
-static std::optional<float> exifentry_to_degrees(ExifEntry *exifEntry)
+static double exif_value_to_degrees(const char *s)
 {
-    if (exifEntry == nullptr || exifEntry->format != EXIF_FORMAT_RATIONAL) {
+    char *pos;
+    double degrees = strtod(s, &pos);
+    degrees += strtod(pos + 1, &pos) / 60.0;
+    degrees += strtod(pos + 1, nullptr) / 3600.0;
+    return degrees;
+}
+
+template <ExifTag tag, ExifTag ref, char pos, char neg>
+static std::optional<double> exif_data_lat_lon(ExifData *d)
+{
+    char buf[2000];
+
+    ExifEntry *e = exif_data_get_entry(d, tag);
+    if (!e) {
+        return std::nullopt;
+    }
+    const char *s = exif_entry_get_value(e, buf, sizeof(buf));
+    if (!s) {
+        return std::nullopt;
+    }
+    double deg = exif_value_to_degrees(s);
+
+    e = exif_data_get_entry(d, ref);
+    if (!e) {
+        return std::nullopt;
+    }
+    s = exif_entry_get_value(e, buf, sizeof(buf));
+    if (!s) {
+        return std::nullopt;
+    }
+    if (s[0] == neg) {
+        deg = -1 * deg;
+    }
+    return deg;
+}
+
+// returns the location as a pair of signed double
+static std::optional<std::tuple<double, double>> location(ExifData *d)
+{
+    auto lat = exif_data_lat_lon<static_cast<ExifTag>(EXIF_TAG_GPS_LATITUDE), static_cast<ExifTag>(EXIF_TAG_GPS_LATITUDE_REF), 'E', 'W'>(d);
+    if (!lat) {
         return std::nullopt;
     }
 
-    ExifByteOrder order = exif_data_get_byte_order(exifEntry->parent->parent);
-    // http://www.opanda.com/en/pe/help/gps.html#GPSLatitude
-    if (exifEntry->components == 3) {
-        // When degrees, minutes and seconds are expressed, the format is dd/1,mm/1,ss/1
-        auto degrees = exif_get_rational(exifEntry->data, order).numerator;
-        auto minutes = exif_get_rational(exifEntry->data + sizeof(ExifRational), order).numerator;
-        auto seconds = exif_get_rational(exifEntry->data + 2*sizeof(ExifRational), order).numerator;
-
-        return degrees + (minutes/60.0) + (seconds/3600.0);
+    auto lon = exif_data_lat_lon<static_cast<ExifTag>(EXIF_TAG_GPS_LONGITUDE), static_cast<ExifTag>(EXIF_TAG_GPS_LONGITUDE_REF), 'N', 'S'>(d);
+    if (!lon) {
+        return std::nullopt;
     }
 
-    // not sure how to handle less components yet
-    return std::nullopt;
+    return std::make_optional(std::make_tuple(lat.value(), lon.value()));
 }
 
-static int index_exif_data(Xapian::TermGenerator &indexer, ExifData *exifData)
+static int index_exif_data(Xapian::TermGenerator &indexer, ExifData *d)
 {
     static char buf[BUFFER_SIZE];
     {
         for (auto tag: {EXIF_TAG_MAKE, EXIF_TAG_MODEL}) {
-            ExifEntry *exifEntry = exif_data_get_entry(exifData, tag);
-            if (exifEntry == nullptr) {
+            ExifEntry *e = exif_data_get_entry(d, tag);
+            if (!e) {
                 spdlog::debug("Can't get exif entry for tag {}", exif_tag_get_name(tag));;
                 continue;
             }
-            const char * val = exif_entry_get_value(exifEntry, buf, sizeof(buf));
-            if (val == nullptr) {
+            const char *s = exif_entry_get_value(e, buf, sizeof(buf));
+            if (!s) {
                 spdlog::debug("Can't get value from entry for tag {}", exif_tag_get_name(tag));
                 continue;
             }
 
             // C: camera
-            indexer.index_text(val, 1, "C");
+            indexer.index_text(s, 1, "C");
         }
     }
-    return 0;
+
     {
-        ExifEntry *exifEntry = exif_data_get_entry(exifData, (ExifTag) EXIF_TAG_GPS_LATITUDE);
-        auto lat = exifentry_to_degrees(exifEntry);
-        if (lat) {
-            spdlog::debug("GPS Lat: {}", lat.value());
+        auto maybe_loc = location(d);
+        if (maybe_loc) {
+            spdlog::debug("GPS {} {}", std::get<0>(maybe_loc.value()), std::get<1>(maybe_loc.value())); 
         } else {
-            spdlog::debug("No GPS Lat");
+            spdlog::debug("No GPS data"); 
         }
     }
     return 0;
@@ -69,22 +102,22 @@ static int index_exif_data(Xapian::TermGenerator &indexer, ExifData *exifData)
 
 int iu_index_file(Xapian::TermGenerator &indexer, const fs::path &p)
 {
-    ExifData *exifData = exif_data_new_from_file(p.c_str());
-    if (!exifData) {
+    ExifData *d = exif_data_new_from_file(p.c_str());
+    if (!d) {
         spdlog::error("Failed to load {}", p.string());
         return -1;
     }
-    exif_data_fix(exifData);
-    //exif_data_dump(exifData);
+    exif_data_fix(d);
+    //exif_data_dump(d);
 
-    auto ret = index_exif_data(indexer, exifData);
+    auto ret = index_exif_data(indexer, d);
     if (ret != 0) {
         spdlog::error("Failed to index {}", p.string());
-        exif_data_unref(exifData);
+        exif_data_unref(d);
         return -1;
     }
 
-    exif_data_unref(exifData);
+    exif_data_unref(d);
     return 0;
 }
 
