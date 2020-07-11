@@ -60,12 +60,12 @@ static std::optional<double> exif_data_lat_lon(ExifData *d)
 // returns the location as a pair of signed double
 static std::optional<std::tuple<double, double>> location(ExifData *d)
 {
-    auto lat = exif_data_lat_lon<static_cast<ExifTag>(EXIF_TAG_GPS_LATITUDE), static_cast<ExifTag>(EXIF_TAG_GPS_LATITUDE_REF), 'E', 'W'>(d);
+    auto lat = exif_data_lat_lon<static_cast<ExifTag>(EXIF_TAG_GPS_LATITUDE), static_cast<ExifTag>(EXIF_TAG_GPS_LATITUDE_REF), 'N', 'S'>(d);
     if (!lat) {
         return std::nullopt;
     }
 
-    auto lon = exif_data_lat_lon<static_cast<ExifTag>(EXIF_TAG_GPS_LONGITUDE), static_cast<ExifTag>(EXIF_TAG_GPS_LONGITUDE_REF), 'N', 'S'>(d);
+    auto lon = exif_data_lat_lon<static_cast<ExifTag>(EXIF_TAG_GPS_LONGITUDE), static_cast<ExifTag>(EXIF_TAG_GPS_LONGITUDE_REF), 'E', 'W'>(d);
     if (!lon) {
         return std::nullopt;
     }
