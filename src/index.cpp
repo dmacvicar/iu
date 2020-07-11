@@ -5,8 +5,6 @@
 #include <tuple>
 #include <filesystem>
 
-#include <exiv2/exiv2.hpp>
-
 #include <spdlog/spdlog.h>
 
 #include <xapian.h>
@@ -23,6 +21,8 @@ int iu_index_directory_recursive(const std::string &root)
     Xapian::WritableDatabase db(std::string(INDEX_PATH), Xapian::DB_CREATE_OR_OPEN);
     Xapian::TermGenerator indexer;
     int failed_count = 0;
+
+    indexer.set_stemmer(Xapian::Stem("german3"));
 
     for (auto& p: fs::recursive_directory_iterator(root)) {
         std::string ext(p.path().extension());
