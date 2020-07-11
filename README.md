@@ -48,24 +48,17 @@ cmake --build build
 
 ```
 # libexif
-$ time build/src/iu index --root ~/Pictures
+$ build/src/iu index --root ~/Pictures
 ...
 indexed: 15465 files
-
-real    0m2.784s
-user    0m2.294s
-sys     0m0.449s
-
-# exiv2
-$ time build/src/iu index --root ~/Pictures
-...
-indexed: 15902 files
-
-real    0m7.783s
-user    0m6.943s
-sys     0m0.797s
-
 ```
+
+### Indexing Performance
+
+Without many optimizations, I can index 15k files (50G) in 2.7s on a old X230 laptop with SSD (libexif backend).
+Adding offline geolocation over 121k places brings that up to 16s.
+
+Using exiv2 makes indexing 3 times slower, so it would be around 22s with geolocation (which stays constant).
 
 ## Search
 
