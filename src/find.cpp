@@ -25,7 +25,8 @@ int iu_search(const std::string &query_str, std::function<void(const std::string
 
         //find the top 10 result
         enquire.set_query(query);
-        Xapian::MSet result = enquire.get_mset(0, 10);
+        auto max_items = db.get_doccount();
+        Xapian::MSet result = enquire.get_mset(0, max_items);
         spdlog::info("{} results found", result.get_matches_estimated());
         for(Xapian::MSetIterator iter = result.begin(); iter != result.end(); iter++){
             Xapian::Document doc = iter.get_document();
