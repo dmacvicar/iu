@@ -40,7 +40,7 @@ int main(int argc, char* argv[])
     }
     spdlog::debug("debug logging enabled...");
 
-    for (const auto subcom : app.get_subcommands()) {
+    for (auto *const subcom : app.get_subcommands()) {
         if (subcom == index) {
             iu_index_directory_recursive(root);
         } else if (subcom == find) {
