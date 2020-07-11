@@ -48,7 +48,7 @@ jobs:
           COMMAND ${CMAKE_COMMAND}
             -S .
             -B build
-            -D tidy
+            -D TIDY=ON
             -D CMAKE_BUILD_TYPE=$ENV{BUILD_TYPE}
             -D IMAGE_METADATA_BACKEND=libexif
             -G Ninja
