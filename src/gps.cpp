@@ -6,23 +6,24 @@
 #include "gps.hpp"
 
 void load_location_countries(std::map<std::string, std::string> &countries) {
-    if (countries.empty()) {
-        // insert all countries in lookup table
-        csv2::Reader<csv2::delimiter<','>,
-                     csv2::quote_character<'\"'>,
-                     csv2::first_row_is_header<false>,
-                     csv2::trim_policy::trim_whitespace> csv;
-        if (csv.mmap("countries.csv")) {
-            for (const auto row: csv) {
-                auto it = row.begin();
-                std::string key, name;
-                (*it).read_value(key); ++it;
-                (*it).read_value(name);
-                countries.insert(std::pair<std::string, std::string>(key, name));
-            }
-        }
-        spdlog::debug("Loaded {} countries", countries.size());
+    if (!countries.empty()) {
+        return;
     }
+    // insert all countries in lookup table
+    csv2::Reader<csv2::delimiter<','>,
+                 csv2::quote_character<'\"'>,
+                 csv2::first_row_is_header<false>,
+                 csv2::trim_policy::trim_whitespace> csv;
+    if (csv.mmap("countries.csv")) {
+        for (const auto row: csv) {
+            auto it = row.begin();
+            std::string key, name;
+            (*it).read_value(key); ++it;
+            (*it).read_value(name);
+            countries.insert(std::pair<std::string, std::string>(key, name));
+        }
+    }
+    spdlog::debug("Loaded {} countries", countries.size());
 }
 
 void load_location_geos(std::vector<std::tuple<double, double, std::string, std::string>> &geo)
