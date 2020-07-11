@@ -1,20 +1,39 @@
 #include <cmath>
+#include <filesystem>
+#include <optional>
 
 #include <csv2/reader.hpp>
 #include <spdlog/spdlog.h>
 
 #include "gps.hpp"
 
+namespace fs = std::filesystem;
+
+static std::optional<fs::path> find_geoloc_resource(const std::string &name) {
+    auto right_here = fs::current_path() / name;
+    if (fs::exists(right_here)) {
+        return right_here;
+    }
+    // TODO later also lookup in system data dir
+    return std::nullopt;
+}
+
 void load_location_countries(std::map<std::string, std::string> &countries) {
     if (!countries.empty()) {
         return;
     }
+
+    auto countries_csv = find_geoloc_resource("countries.csv");
+    if (!countries_csv) {
+        throw std::runtime_error("Can't find countries.csv, used for geolocation");
+    }
+
     // insert all countries in lookup table
     csv2::Reader<csv2::delimiter<','>,
                  csv2::quote_character<'\"'>,
                  csv2::first_row_is_header<false>,
                  csv2::trim_policy::trim_whitespace> csv;
-    if (csv.mmap("countries.csv")) {
+    if (csv.mmap(countries_csv->string())) {
         for (const auto row: csv) {
             auto it = row.begin();
             std::string key, name;
@@ -28,30 +47,37 @@ void load_location_countries(std::map<std::string, std::string> &countries) {
 
 void load_location_geos(std::vector<std::tuple<double, double, std::string, std::string>> &geo)
 {
-    if (geo.empty()) {
-        // insert all countries in lookup table
-        csv2::Reader<csv2::delimiter<','>,
-                     csv2::quote_character<'\"'>,
-                     csv2::first_row_is_header<false>,
-                     csv2::trim_policy::trim_whitespace> csv;
-        if (csv.mmap("geocode.csv")) {
-            for (const auto row: csv) {
-                auto it = row.begin();
-                std::string lats, lons, cc, name;
-                (*it).read_value(lats); ++it;
-                (*it).read_value(lons); ++it;
-                (*it).read_value(cc); ++it;
-                (*it).read_value(name);
-                try {
-                    geo.push_back(std::make_tuple(std::stod(lats), std::stod(lons), cc, name));
-                } catch (std::invalid_argument e) {
-                    spdlog::error("Could not convert {} {} {} {} to numbers", lats, lons, cc, name);
-                    continue;
-                }
+    if (!geo.empty()) {
+        return;
+    }
+
+    auto geocode_csv = find_geoloc_resource("geocode.csv");
+    if (!geocode_csv) {
+        throw std::runtime_error("Can't find geocode.csv, used for geolocation");
+    }
+
+    // insert all countries in lookup table
+    csv2::Reader<csv2::delimiter<','>,
+                 csv2::quote_character<'\"'>,
+                 csv2::first_row_is_header<false>,
+                 csv2::trim_policy::trim_whitespace> csv;
+    if (csv.mmap(geocode_csv->string())) {
+        for (const auto row: csv) {
+            auto it = row.begin();
+            std::string lats, lons, cc, name;
+            (*it).read_value(lats); ++it;
+            (*it).read_value(lons); ++it;
+            (*it).read_value(cc); ++it;
+            (*it).read_value(name);
+            try {
+                geo.push_back(std::make_tuple(std::stod(lats), std::stod(lons), cc, name));
+            } catch (std::invalid_argument e) {
+                spdlog::error("Could not convert {} {} {} {} to numbers", lats, lons, cc, name);
+                continue;
             }
         }
-        spdlog::debug("Loaded {} locations", geo.size());
     }
+    spdlog::debug("Loaded {} locations", geo.size());
 }
 
 // https://en.wikipedia.org/wiki/Haversine_formula
