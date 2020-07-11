@@ -50,7 +50,7 @@ jobs:
             -B build
             -D tidy
             -D CMAKE_BUILD_TYPE=$ENV{BUILD_TYPE}
-            -D -DIMAGE_METADATA_BACKEND=libexif
+            -D IMAGE_METADATA_BACKEND=libexif
             -G Ninja
             -D CMAKE_MAKE_PROGRAM=ninja
           RESULT_VARIABLE result
