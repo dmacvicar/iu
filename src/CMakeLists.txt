@@ -1,8 +1,8 @@
 if(TIDY)
   set(CMAKE_CXX_CLANG_TIDY
     clang-tidy;
-    -header-filter=.;
-    -checks=cppcoreguidelines-*, portability-*, readability-*;)
+    -header-filter=${CMAKE_SOURCE_DIR}/src;
+    -checks=cppcoreguidelines-*,portability-*,readability-*;)
 endif()
 
 set(libiu_SOURCES
