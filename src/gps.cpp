@@ -78,22 +78,30 @@ std::optional<std::tuple<std::string, std::string>> location_text(double lat, do
 
     // find the minimum distance
     std::optional<double> min;
+    std::optional<std::tuple<double, double, std::string, std::string>> closest_entry;
+
     for (const auto &entry: geo) {
         auto lat2 = std::get<0>(entry);
         auto lon2 = std::get<1>(entry);
 
         auto d = haversine_distance(lat, lon, lat2, lon2);
-        // make it dumb simple for now, within 2 km
-        if (d < 2) {
-            auto country_code = std::get<2>(entry);
-            auto country = countries.find(country_code);
-            if (country == countries.end()) {
-                return std::nullopt;
-            }
-            auto place = std::get<3>(entry);
-            spdlog::debug("Photo taken near {}, {}", place, country->second);
-            return make_tuple(country->second, place);
+        if (!min || d < *min) {
+            min = d;
+            closest_entry = entry;
         }
     }
-    return std::nullopt;
+
+    if (!closest_entry) {
+        return std::nullopt;
+    }
+
+    auto country_code = std::get<2>(*closest_entry);
+    auto country = countries.find(country_code);
+    if (country == countries.end()) {
+        return std::nullopt;
+    }
+    auto place = std::get<3>(*closest_entry);
+    spdlog::debug("Photo taken near {}, {} ({} km)", place, country->second, *min);
+    return std::make_tuple(country->second, place);
 }
+
