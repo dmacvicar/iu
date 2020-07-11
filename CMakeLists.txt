@@ -5,4 +5,5 @@ set(IMAGE_METADATA_BACKEND "exiv2" CACHE STRING "Image Metada" )
 
 add_subdirectory(ext)
 add_subdirectory(src)
+add_subdirectory(test)
 

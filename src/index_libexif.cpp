@@ -1,14 +1,19 @@
 #include <cstdlib>
 #include <string>
 #include <filesystem>
+#include <map>
+#include <vector>
 
 #include <libexif/exif-data.h>
 #include <libexif/exif-tag.h>
 #include <libexif/exif-utils.h>
 
+#include <csv2/reader.hpp>
 #include <spdlog/spdlog.h>
 
 #include <xapian.h>
+
+#include "gps.hpp"
 
 constexpr auto BUFFER_SIZE = 2000;
 
@@ -92,7 +97,14 @@ static int index_exif_data(Xapian::TermGenerator &indexer, ExifData *d)
     {
         auto maybe_loc = location(d);
         if (maybe_loc) {
-            spdlog::debug("GPS {} {}", std::get<0>(maybe_loc.value()), std::get<1>(maybe_loc.value())); 
+            spdlog::debug("GPS {} {}", std::get<0>(maybe_loc.value()), std::get<1>(maybe_loc.value()));
+            auto maybe_text = location_text(std::get<0>(maybe_loc.value()), std::get<1>(maybe_loc.value()));
+            if (maybe_text) {
+                // country
+                indexer.index_text(std::get<0>(maybe_text.value()), 1, "P");
+                // place
+                indexer.index_text(std::get<1>(maybe_text.value()), 1, "P");
+            }
         } else {
             spdlog::debug("No GPS data"); 
         }

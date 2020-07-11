@@ -20,6 +20,18 @@ FetchContent_Declare(nanoflann
 )
 FetchContent_MakeAvailable(nanoflann)
 
+FetchContent_Declare(csv2
+  GIT_REPOSITORY https://github.com/p-ranav/csv2.git
+  GIT_SHALLOW ON
+)
+FetchContent_MakeAvailable(csv2)
+
+FetchContent_Declare(catch2
+  GIT_REPOSITORY https://github.com/catchorg/Catch2
+  GIT_SHALLOW ON
+)
+FetchContent_MakeAvailable(catch2)
+
 include(FindPkgConfig)
 find_package(PkgConfig REQUIRED)
 if(IMAGE_METADATA_BACKEND STREQUAL "exiv2")

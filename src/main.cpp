@@ -1,15 +1,20 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <numeric>
 
 #include <CLI/CLI.hpp>
 #include <spdlog/spdlog.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
 
 #include "find.hpp"
 #include "index.hpp"
 
 int main(int argc, char* argv[])
 {
+    auto logger = spdlog::stderr_color_mt("stderr");
+    spdlog::set_default_logger(logger);
+
     CLI::App app("iu - The image indexer");
     app.set_help_all_flag("--help-all", "Expand all help");
     auto *debug = app.add_flag("-d,--debug", "Debug mode");
@@ -26,6 +31,7 @@ int main(int argc, char* argv[])
 
     std::string query;
     find->add_option("query", query, "Query")->required();
+    auto *browse = find->add_flag("-b,--browse", "Browse results");
 
     CLI11_PARSE(app, argc, argv);
 
@@ -38,8 +44,24 @@ int main(int argc, char* argv[])
         if (subcom == index) {
             iu_index_directory_recursive(root);
         } else if (subcom == find) {
-            if (iu_search(query) != 0) {
-                return -1;
+            if (browse->count() > 0) {
+                std::stringstream cmd;
+                cmd << "gthumb ";
+                auto ret = iu_search(query, [&cmd](const std::string &result) { 
+                                                cmd << "\"" <<  result << "\" ";
+                                            });
+                if (ret != 0) {
+                    return -1;
+                }
+                //std::system(cmd.str().c_str());
+                std::cout << cmd.str().c_str() << std::endl;
+            } else {
+                auto ret = iu_search(query, [](const std::string &result) {
+                                                std::cout << result << std::endl;
+                                            });
+                if (ret != 0) {
+                    return -1;
+                }
             }
         }
     }

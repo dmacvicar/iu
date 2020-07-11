@@ -4,10 +4,12 @@
 #include <spdlog/spdlog.h>
 #include <xapian.h>
 
+#include "find.hpp"
+
 constexpr auto INDEX_PATH = "./index_data";
 constexpr auto F_DOCID = 1;
 
-int iu_search(const std::string &query_str)
+int iu_search(const std::string &query_str, std::function<void(const std::string)>  cb)
 {
     try {
         std::string path(INDEX_PATH);
@@ -17,16 +19,17 @@ int iu_search(const std::string &query_str)
         Xapian::QueryParser qp;
         qp.add_prefix("camera", "C");
         qp.add_prefix("file", "Q");
+        qp.add_prefix("place", "P");
         Xapian::Query query = qp.parse_query(query_str);
         spdlog::debug("Query: {}", query.get_description());
 
         //find the top 10 result
         enquire.set_query(query);
         Xapian::MSet result = enquire.get_mset(0, 10);
-        std::cout << result.get_matches_estimated() << " result found" << std::endl;
+        spdlog::info("{} results found", result.get_matches_estimated());
         for(Xapian::MSetIterator iter = result.begin(); iter != result.end(); iter++){
             Xapian::Document doc = iter.get_document();
-            std::cout << iter.get_rank() << ": docid " << doc.get_value(F_DOCID) << std::endl;
+            cb(doc.get_value(F_DOCID));
         }
 
     } catch(const Xapian::Error e) {
