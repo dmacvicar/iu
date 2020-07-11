@@ -1,0 +1,72 @@
+name: Build
+on: [push, pull_request]
+env:
+  BUILD_TYPE: Release
+jobs:
+  build:
+    name: ${{ matrix.config.name }}
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+        - name: "Ubuntu Latest GCC"
+          os: ubuntu-latest
+          cc: "gcc-9"
+          cxx: "g++-9"
+        - name: "macOS Latest Clang"
+          os: macos-latest
+          cc: "clang"
+          cxx: "clang++"
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
+    - name: Install package dependencies
+      id: cmake_and_ninja
+      shell: cmake -P {0}
+      run: |
+        if ("${{ runner.os }}" STREQUAL "Linux")
+          execute_process(COMMAND sudo apt-get update)
+          execute_process(COMMAND sudo apt-get install libxapian-dev)
+          execute_process(COMMAND sudo apt-get install libexif-dev)
+          execute_process(COMMAND sudo apt-get install ninja-build)
+        elseif ("${{ runner.os }}" STREQUAL "macOS")
+          execute_process(COMMAND brew install pkg-config)
+          execute_process(COMMAND brew install libexif)
+          execute_process(COMMAND brew install xapian)
+          execute_process(COMMAND brew install ninja)
+        endif()
+    - name: Configure
+      shell: cmake -P {0}
+      run: |
+        set(ENV{CC} ${{ matrix.config.cc }})
+        set(ENV{CXX} ${{ matrix.config.cxx }})
+
+        execute_process(
+          COMMAND ${CMAKE_COMMAND}
+            -S .
+            -B build
+            -D CMAKE_BUILD_TYPE=$ENV{BUILD_TYPE}
+            -G Ninja
+            -D CMAKE_MAKE_PROGRAM=ninja
+          RESULT_VARIABLE result
+          ERROR_VARIABLE error_message
+        )
+
+        if (NOT result EQUAL 0)
+          message(FATAL_ERROR "Could not run with ${CMAKE_COMMAND}: Got ${error_message} - ${result}")
+        endif()
+    - name: Build
+      shell: cmake -P {0}
+      run: |
+        execute_process(
+          COMMAND ${CMAKE_COMMAND} --build build
+          RESULT_VARIABLE result
+          ERROR_VARIABLE error_message
+        )
+
+        if (NOT result EQUAL 0)
+          message(FATAL_ERROR "Could not run with ${CMAKE_COMMAND}: Got ${error_message} - ${result}")
+        endif()
