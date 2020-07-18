@@ -9,6 +9,8 @@
 
 #include <xapian.h>
 
+#include "detect_objects.hpp"
+
 constexpr auto INDEX_PATH = "./index_data";
 constexpr auto F_DOCID = 1;
 
@@ -21,8 +23,6 @@ int iu_index_directory_recursive(const std::string &root)
     Xapian::WritableDatabase db(std::string(INDEX_PATH), Xapian::DB_CREATE_OR_OPEN);
     Xapian::TermGenerator indexer;
     int failed_count = 0;
-
-    indexer.set_stemmer(Xapian::Stem("german3"));
 
     for (auto& p: fs::recursive_directory_iterator(root)) {
         std::string ext(p.path().extension());
@@ -41,6 +41,13 @@ int iu_index_directory_recursive(const std::string &root)
         if (iu_index_file(indexer, p.path()) != 0) {
             spdlog::error("Error while indexing {} metadata", p.path().string());
             continue;
+        }
+
+        // object detection
+        auto labels = detect_objects(p.path().string());
+        for (auto label: labels) {
+            indexer.index_text(label, 1, "O");
+
         }
 
         std::string idterm("Q" + p.path().string());

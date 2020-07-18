@@ -15,15 +15,16 @@ int iu_search(const std::string &query_str, std::function<void(const std::string
         std::string path(INDEX_PATH);
         Xapian::Database db(path);
         Xapian::Enquire enquire(db);
-
         Xapian::QueryParser qp;
+
         qp.add_prefix("camera", "C");
         qp.add_prefix("file", "Q");
         qp.add_prefix("place", "P");
+        qp.add_prefix("object", "O");
+
         Xapian::Query query = qp.parse_query(query_str);
         spdlog::debug("Query: {}", query.get_description());
 
-        //find the top 10 result
         enquire.set_query(query);
         auto max_items = db.get_doccount();
         Xapian::MSet result = enquire.get_mset(0, max_items);

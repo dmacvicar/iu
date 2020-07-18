@@ -10,6 +10,7 @@ set(libiu_SOURCES
   index.cpp
   index_${IMAGE_METADATA_BACKEND}.cpp
   gps.cpp
+  detect_objects.cpp
   )
 
 add_library(libiu STATIC ${libiu_SOURCES})
@@ -22,6 +23,7 @@ if(IMAGE_METADATA_BACKEND STREQUAL "exiv2")
 elseif (IMAGE_METADATA_BACKEND STREQUAL "libexif")
   target_link_libraries(libiu ${LIBEXIF_LIBRARIES})
 endif()
+target_link_libraries(libiu dark)
 
 add_executable(iu
   main.cpp
@@ -35,3 +37,4 @@ include_directories(${CLI11_SOURCE_DIR}/include)
 include_directories(${spdlog_SOURCE_DIR}/include)
 include_directories(${nanoflann_SOURCE_DIR}/include)
 include_directories(${csv2_SOURCE_DIR}/include)
+include_directories(${Darknet_SOURCE_DIR}/include)

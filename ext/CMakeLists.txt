@@ -12,13 +12,11 @@ FetchContent_Declare(spdlog
 )
 FetchContent_MakeAvailable(spdlog)
 
-FetchContent_Declare(nanoflann
-  GIT_REPOSITORY https://github.com/jlblancoc/nanoflann.git
+FetchContent_Declare(darknet
+  GIT_REPOSITORY https://github.com/AlexeyAB/darknet
   GIT_SHALLOW ON
-  EXCLUDE_FROM_ALL ON
-  EXCLUDE_FROM_MAIN TRUE
-)
-FetchContent_MakeAvailable(nanoflann)
+  )
+FetchContent_MakeAvailable(darknet)
 
 FetchContent_Declare(csv2
   GIT_REPOSITORY https://github.com/p-ranav/csv2.git
