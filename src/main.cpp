@@ -29,6 +29,9 @@ int main(int argc, char* argv[])
         ->required()
         ->check(CLI::ExistingDirectory);
 
+    index->add_flag("-o,--detect-objects,!--skip-detect-objects", index_opts.detect_objects, "Detect object names");
+    index->add_flag("-d,--detect-places,!--skip-detect-places", index_opts.detect_objects, "Detect places names");
+
     std::string query;
     find->add_option("query", query, "Query")->required();
     auto *browse = find->add_flag("-b,--browse", "Browse results");

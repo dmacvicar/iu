@@ -4,6 +4,7 @@
 #include <spdlog/spdlog.h>
 #include <xapian.h>
 
+#include "index.hpp"
 #include "find.hpp"
 
 namespace iu {
@@ -19,10 +20,14 @@ int search(const std::string &query_str, std::function<void(const std::string)> 
         Xapian::Enquire enquire(db);
         Xapian::QueryParser qp;
 
-        qp.add_prefix("camera", "C");
-        qp.add_prefix("file", "Q");
-        qp.add_prefix("place", "P");
-        qp.add_prefix("object", "O");
+        std::map<std::string, std::string> fields = {{FIELD_CAMERA_NAME, FIELD_CAMERA_PREFIX},
+                                                     {FIELD_OBJECT_NAME, FIELD_OBJECT_PREFIX},
+                                                     {FIELD_PLACE_NAME, FIELD_PLACE_PREFIX},
+                                                     {FIELD_FILE_NAME, FIELD_FILE_PREFIX}};
+        for (auto& [name, prefix]: fields) {
+            spdlog::debug("Adding shortuct '{}' for prefix '{}'", name, prefix);
+            qp.add_prefix(name, prefix);
+        }
 
         Xapian::Query query = qp.parse_query(query_str);
         spdlog::debug("Query: {}", query.get_description());

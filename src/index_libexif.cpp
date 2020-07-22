@@ -13,7 +13,7 @@
 
 #include <xapian.h>
 
-#include "gps.hpp"
+#include "index.hpp"
 
 namespace iu {
 
@@ -60,7 +60,7 @@ static std::optional<double> exif_data_lat_lon(ExifData *d)
 }
 
 // returns the location as a pair of signed double
-static std::optional<std::tuple<double, double>> location(ExifData *d)
+static std::optional<std::pair<double, double>> location(ExifData *d)
 {
     auto lat = exif_data_lat_lon<static_cast<ExifTag>(EXIF_TAG_GPS_LATITUDE), static_cast<ExifTag>(EXIF_TAG_GPS_LATITUDE_REF), 'N', 'S'>(d);
     if (!lat) {
@@ -72,10 +72,10 @@ static std::optional<std::tuple<double, double>> location(ExifData *d)
         return std::nullopt;
     }
 
-    return std::make_optional(std::make_tuple(lat.value(), lon.value()));
+    return std::make_optional(std::make_pair(lat.value(), lon.value()));
 }
 
-static int index_exif_data(Xapian::TermGenerator &indexer, ExifData *d)
+static int gather_exif_data(const index_opts &opts, image_metadata &md, ExifData *d)
 {
     static char buf[BUFFER_SIZE];
     {
@@ -92,29 +92,16 @@ static int index_exif_data(Xapian::TermGenerator &indexer, ExifData *d)
             }
 
             // C: camera
-            indexer.index_text(s, 1, "C");
+            md.camera.insert(s);
         }
     }
 
-    {
-        auto maybe_loc = location(d);
-        if (maybe_loc) {
-            spdlog::debug("GPS {} {}", std::get<0>(maybe_loc.value()), std::get<1>(maybe_loc.value()));
-            auto maybe_text = location_text(std::get<0>(maybe_loc.value()), std::get<1>(maybe_loc.value()));
-            if (maybe_text) {
-                // country
-                indexer.index_text(std::get<0>(maybe_text.value()), 1, "P");
-                // place
-                indexer.index_text(std::get<1>(maybe_text.value()), 1, "P");
-            }
-        } else {
-            spdlog::debug("No GPS data"); 
-        }
-    }
+    md.location = location(d);
+
     return 0;
 }
 
-int iu_index_file(Xapian::TermGenerator &indexer, const fs::path &p)
+int file_gather_metadata(const index_opts &opts, image_metadata &md, const fs::path &p)
 {
     ExifData *d = exif_data_new_from_file(p.c_str());
     if (!d) {
@@ -124,7 +111,7 @@ int iu_index_file(Xapian::TermGenerator &indexer, const fs::path &p)
     exif_data_fix(d);
     //exif_data_dump(d);
 
-    auto ret = index_exif_data(indexer, d);
+    auto ret = gather_exif_data(opts, md, d);
     if (ret != 0) {
         spdlog::error("Failed to index {}", p.string());
         exif_data_unref(d);
