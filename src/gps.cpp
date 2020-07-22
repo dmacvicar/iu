@@ -7,6 +7,8 @@
 
 #include "gps.hpp"
 
+namespace iu {
+
 namespace fs = std::filesystem;
 
 static std::optional<fs::path> find_geoloc_resource(const std::string &name) {
@@ -132,3 +134,4 @@ std::optional<std::tuple<std::string, std::string>> location_text(double lat, do
     return std::make_tuple(country->second, place);
 }
 
+} // namespace iu

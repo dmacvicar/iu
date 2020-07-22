@@ -6,6 +6,8 @@
 
 #include "detect_objects.hpp"
 
+namespace iu {
+
 namespace fs = std::filesystem;
 
 constexpr int NUM_LABELS = 80;
@@ -42,3 +44,5 @@ std::set<std::string> detect_objects(const fs::path p)
     }
     return detected_labels;
 }
+
+} // namespace iu

@@ -11,6 +11,8 @@
 
 #include "detect_objects.hpp"
 
+namespace iu {
+
 constexpr auto INDEX_PATH = "./index_data";
 constexpr auto F_DOCID = 1;
 
@@ -18,7 +20,7 @@ namespace fs = std::filesystem;
 
 extern int iu_index_file(Xapian::TermGenerator &indexer, const fs::path &file_path);
 
-int iu_index_directory_recursive(const std::string &root)
+int index_directory_recursive(const std::string &root)
 {
     Xapian::WritableDatabase db(std::string(INDEX_PATH), Xapian::DB_CREATE_OR_OPEN);
     Xapian::TermGenerator indexer;
@@ -63,3 +65,4 @@ int iu_index_directory_recursive(const std::string &root)
     return 0;
 }
 
+} // namespace iu

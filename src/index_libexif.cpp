@@ -15,6 +15,8 @@
 
 #include "gps.hpp"
 
+namespace iu {
+
 constexpr auto BUFFER_SIZE = 2000;
 
 namespace fs = std::filesystem;
@@ -133,3 +135,4 @@ int iu_index_file(Xapian::TermGenerator &indexer, const fs::path &p)
     return 0;
 }
 
+} // namespace iu

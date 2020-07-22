@@ -42,21 +42,21 @@ int main(int argc, char* argv[])
 
     for (auto *const subcom : app.get_subcommands()) {
         if (subcom == index) {
-            iu_index_directory_recursive(root);
+            iu::index_directory_recursive(root);
         } else if (subcom == find) {
             if (browse->count() > 0) {
                 std::stringstream cmd;
-                cmd << "gthumb ";
-                auto ret = iu_search(query, [&cmd](const std::string &result) { 
+                cmd << "eog ";
+                auto ret = iu::search(query, [&cmd](const std::string &result) { 
                                                 cmd << "\"" <<  result << "\" ";
                                             });
                 if (ret != 0) {
                     return -1;
                 }
-                //std::system(cmd.str().c_str());
                 std::cout << cmd.str().c_str() << std::endl;
+                system(cmd.str().c_str());
             } else {
-                auto ret = iu_search(query, [](const std::string &result) {
+                auto ret = iu::search(query, [](const std::string &result) {
                                                 std::cout << result << std::endl;
                                             });
                 if (ret != 0) {

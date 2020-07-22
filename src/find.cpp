@@ -6,10 +6,12 @@
 
 #include "find.hpp"
 
+namespace iu {
+
 constexpr auto INDEX_PATH = "./index_data";
 constexpr auto F_DOCID = 1;
 
-int iu_search(const std::string &query_str, std::function<void(const std::string)>  cb)
+int search(const std::string &query_str, std::function<void(const std::string)>  cb)
 {
     try {
         std::string path(INDEX_PATH);
@@ -40,3 +42,5 @@ int iu_search(const std::string &query_str, std::function<void(const std::string
     }
     return 0;
 }
+
+} // namespace iu
