@@ -9,6 +9,7 @@
 
 #include <xapian.h>
 
+#include "index.hpp"
 #include "detect_objects.hpp"
 
 namespace iu {
@@ -20,13 +21,13 @@ namespace fs = std::filesystem;
 
 extern int iu_index_file(Xapian::TermGenerator &indexer, const fs::path &file_path);
 
-int index_directory_recursive(const std::string &root)
+int index_directory_recursive(const index_opts &opts)
 {
     Xapian::WritableDatabase db(std::string(INDEX_PATH), Xapian::DB_CREATE_OR_OPEN);
     Xapian::TermGenerator indexer;
     int failed_count = 0;
 
-    for (auto& p: fs::recursive_directory_iterator(root)) {
+    for (auto& p: fs::recursive_directory_iterator(opts.root)) {
         std::string ext(p.path().extension());
         std::transform(ext.begin(), ext.end(), ext.begin(),
                        [](unsigned char c){ return std::tolower(c); });

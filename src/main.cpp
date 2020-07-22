@@ -23,9 +23,9 @@ int main(int argc, char* argv[])
     CLI::App *find = app.add_subcommand("find", "Query the image database");
     app.require_subcommand();
 
-    std::string root;
+    iu::index_opts index_opts;
     // TODO remove required once there is a good default
-    index->add_option("-r,--root", root, "Folder root")
+    index->add_option("-r,--root", index_opts.root, "Folder root")
         ->required()
         ->check(CLI::ExistingDirectory);
 
@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
 
     for (auto *const subcom : app.get_subcommands()) {
         if (subcom == index) {
-            iu::index_directory_recursive(root);
+            iu::index_directory_recursive(index_opts);
         } else if (subcom == find) {
             if (browse->count() > 0) {
                 std::stringstream cmd;
