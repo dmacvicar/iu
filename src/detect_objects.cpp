@@ -29,9 +29,7 @@ std::set<std::string> detect_objects(const fs::path p)
         labels = read_names("coco.names");
     }
 
-    spdlog::info("Hello! {}", p.string());
-
-    static std::set<std::string> detected_labels;
+    std::set<std::string> detected_labels;
 
     std::vector<bbox_t> boxes = obj.detect(p.string(), 0.3);
     for(int i = 0; i < boxes.size(); i++)
