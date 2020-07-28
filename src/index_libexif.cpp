@@ -98,6 +98,30 @@ static int gather_exif_data(const index_opts &opts, image_metadata &md, ExifData
 
     md.location = location(d);
 
+    {
+        ExifEntry *e = exif_data_get_entry(d, EXIF_TAG_DATE_TIME);
+        if (!e) {
+            spdlog::debug("Can't get exif entry for tag {}", exif_tag_get_name(EXIF_TAG_DATE_TIME));
+            return -1;
+        }
+        const char *s = exif_entry_get_value(e, buf, sizeof(buf));
+        if (!s) {
+            spdlog::debug("Can't get value from entry for tag {}", exif_tag_get_name(EXIF_TAG_DATE_TIME));
+            return -1;
+        } else {
+            spdlog::debug("date {}: {}", exif_tag_get_name(EXIF_TAG_DATE_TIME), s);
+            std::tm tm = {};
+            std::stringstream ss(s);
+            ss >> std::get_time(&tm, "%Y:%m:%d %H:%M:%S");
+            if (ss.fail()) {
+                spdlog::error("Parse failed\n");
+                return -1;
+            } else {
+                md.date_time = tm;
+            }
+        }
+    }
+
     return 0;
 }
 

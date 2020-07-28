@@ -10,7 +10,6 @@
 namespace iu {
 
 constexpr auto INDEX_PATH = "./index_data";
-constexpr auto F_DOCID = 1;
 
 int search(const std::string &query_str, std::function<void(const std::string)>  cb)
 {
@@ -20,7 +19,13 @@ int search(const std::string &query_str, std::function<void(const std::string)> 
         Xapian::Enquire enquire(db);
         Xapian::QueryParser qp;
 
+        std::string date_prefix(FIELD_DATE_PREFIX);
+        spdlog::debug("SHIT: {}", FIELD_DATE_PREFIX);
+        Xapian::DateRangeProcessor date_vrp(FIELD_DATE_NO, "date:");
+        qp.add_rangeprocessor(&date_vrp);
+        
         std::map<std::string, std::string> fields = {{FIELD_CAMERA_NAME, FIELD_CAMERA_PREFIX},
+                                                     {FIELD_DATE_NAME, FIELD_DATE_PREFIX},
                                                      {FIELD_OBJECT_NAME, FIELD_OBJECT_PREFIX},
                                                      {FIELD_PLACE_NAME, FIELD_PLACE_PREFIX},
                                                      {FIELD_FILE_NAME, FIELD_FILE_PREFIX}};
@@ -38,7 +43,7 @@ int search(const std::string &query_str, std::function<void(const std::string)> 
         spdlog::info("{} results found", result.get_matches_estimated());
         for(Xapian::MSetIterator iter = result.begin(); iter != result.end(); iter++){
             Xapian::Document doc = iter.get_document();
-            cb(doc.get_value(F_DOCID));
+            cb(doc.get_value(FIELD_ID_NO));
         }
 
     } catch(const Xapian::Error e) {

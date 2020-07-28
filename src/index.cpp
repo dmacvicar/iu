@@ -19,7 +19,6 @@
 namespace iu {
 
 constexpr auto INDEX_PATH = "./index_data";
-constexpr auto F_DOCID = 1;
 
 namespace fs = std::filesystem;
 
@@ -32,9 +31,10 @@ int index_directory_recursive(const index_opts &opts)
     int failed_count = 0;
 
     auto camera_prefix(FIELD_CAMERA_PREFIX);
-    auto place_prefix(FIELD_PLACE_PREFIX);
-    auto object_prefix(FIELD_OBJECT_PREFIX);
+    auto date_prefix(FIELD_DATE_PREFIX);
     auto file_prefix(FIELD_FILE_PREFIX);
+    auto object_prefix(FIELD_OBJECT_PREFIX);
+    auto place_prefix(FIELD_PLACE_PREFIX);
 
     for (auto& p: fs::recursive_directory_iterator(opts.root)) {
         std::string ext(p.path().extension());
@@ -47,7 +47,7 @@ int index_directory_recursive(const index_opts &opts)
 
         Xapian::Document doc;
         indexer.set_document(doc);
-        doc.add_value(F_DOCID, p.path().string());
+        doc.add_value(FIELD_ID_NO, p.path().string());
 
         image_metadata md;
         // call the compile-time backend version
@@ -84,6 +84,14 @@ int index_directory_recursive(const index_opts &opts)
             for (auto label: labels) {
                 indexer.index_text(label, 1, object_prefix);
             }
+        }
+
+        // date
+        if (md.date_time) {
+            char buf[2000];
+            std::strftime(buf, sizeof(buf), "%Y%m%d", &md.date_time.value());
+            spdlog::debug("date: {}", buf);
+            doc.add_value(FIELD_DATE_NO, buf);
         }
 
         std::string idterm(file_prefix + p.path().string());
