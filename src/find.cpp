@@ -20,7 +20,6 @@ int search(const std::string &query_str, std::function<void(const std::string)> 
         Xapian::QueryParser qp;
 
         std::string date_prefix(FIELD_DATE_PREFIX);
-        spdlog::debug("SHIT: {}", FIELD_DATE_PREFIX);
         Xapian::DateRangeProcessor date_vrp(FIELD_DATE_NO, "date:");
         qp.add_rangeprocessor(&date_vrp);
         
