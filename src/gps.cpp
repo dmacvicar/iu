@@ -122,7 +122,7 @@ std::optional<std::tuple<std::string, std::string>> location_text(double lat, do
         return std::nullopt;
     }
     auto place = std::get<3>(*closest_entry);
-    spdlog::debug("Photo taken near {}, {} ({} km)", place, country->second, *min);
+    spdlog::debug("Photo taken near {}, {} ({:.2f} km)", place, country->second, *min);
     return std::make_tuple(country->second, place);
 }
 
