@@ -53,7 +53,7 @@ int index_directory_recursive(const index_opts &opts)
         // call the compile-time backend version
         if (file_gather_metadata(opts, md, p.path()) != 0) {
             spdlog::error("Error while indexing {} metadata", p.path().string());
-            continue;
+            //continue;
         }
 
         // camera
@@ -80,7 +80,11 @@ int index_directory_recursive(const index_opts &opts)
 
         // object detection
         if (opts.detect_objects) {
-            auto labels = detect_objects(p.path().string());
+            std::set<std::string> labels;
+            if (detect_objects(labels, p.path().string()) != 0) {
+                spdlog::error("Failed to execute classify the image");
+            }
+
             for (auto label: labels) {
                 indexer.index_text(label, 1, object_prefix);
             }

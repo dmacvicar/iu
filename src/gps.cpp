@@ -6,28 +6,20 @@
 #include <spdlog/spdlog.h>
 
 #include "gps.hpp"
+#include "resources.hpp"
 
 namespace iu {
 
 namespace fs = std::filesystem;
-
-static std::optional<fs::path> find_geoloc_resource(const std::string &name) {
-    auto right_here = fs::current_path() / name;
-    if (fs::exists(right_here)) {
-        return right_here;
-    }
-    // TODO later also lookup in system data dir
-    return std::nullopt;
-}
 
 void load_location_countries(std::map<std::string, std::string> &countries) {
     if (!countries.empty()) {
         return;
     }
 
-    auto countries_csv = find_geoloc_resource("countries.csv");
+    auto countries_csv = find_resource("countries.csv");
     if (!countries_csv) {
-        throw std::runtime_error("Can't find countries.csv, used for geolocation");
+        throw std::runtime_error("Can't find country data, used for geolocation");
     }
 
     // insert all countries in lookup table
@@ -53,9 +45,9 @@ void load_location_geos(std::vector<std::tuple<double, double, std::string, std:
         return;
     }
 
-    auto geocode_csv = find_geoloc_resource("geocode.csv");
+    auto geocode_csv = find_resource("geocode.csv");
     if (!geocode_csv) {
-        throw std::runtime_error("Can't find geocode.csv, used for geolocation");
+        throw std::runtime_error("Can't find geocode data, used for geolocation");
     }
 
     // insert all countries in lookup table

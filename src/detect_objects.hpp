@@ -5,6 +5,6 @@
 
 namespace iu {
 
-std::set<std::string> detect_objects(const std::filesystem::path p);
+int detect_objects(std::set<std::string> &labels, const std::filesystem::path p);
 
 }

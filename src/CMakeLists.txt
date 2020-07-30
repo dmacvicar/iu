@@ -8,6 +8,7 @@ endif()
 set(libiu_SOURCES
   find.cpp
   index.cpp
+  resources.cpp
   index_${IMAGE_METADATA_BACKEND}.cpp
   gps.cpp
   detect_objects.cpp
@@ -23,7 +24,9 @@ if(IMAGE_METADATA_BACKEND STREQUAL "exiv2")
 elseif (IMAGE_METADATA_BACKEND STREQUAL "libexif")
   target_link_libraries(libiu ${LIBEXIF_LIBRARIES})
 endif()
-target_link_libraries(libiu dark)
+# FIXME not working
+#target_link_libraries(libiu ${OpenCV_LIBS})
+target_link_libraries(libiu opencv_core opencv_dnn opencv_imgcodecs)
 
 add_executable(iu
   main.cpp
@@ -37,4 +40,4 @@ include_directories(${CLI11_SOURCE_DIR}/include)
 include_directories(${spdlog_SOURCE_DIR}/include)
 include_directories(${nanoflann_SOURCE_DIR}/include)
 include_directories(${csv2_SOURCE_DIR}/include)
-include_directories(${Darknet_SOURCE_DIR}/include)
+include_directories(${OpenCV_INCLUDE_DIRS})

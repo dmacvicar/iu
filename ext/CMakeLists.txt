@@ -12,12 +12,6 @@ FetchContent_Declare(spdlog
 )
 FetchContent_MakeAvailable(spdlog)
 
-FetchContent_Declare(darknet
-  GIT_REPOSITORY https://github.com/AlexeyAB/darknet
-  GIT_SHALLOW ON
-  )
-FetchContent_MakeAvailable(darknet)
-
 FetchContent_Declare(csv2
   GIT_REPOSITORY https://github.com/p-ranav/csv2.git
   GIT_SHALLOW ON
@@ -39,3 +33,5 @@ elseif (IMAGE_METADATA_BACKEND STREQUAL "libexif")
 else()
   message(FATAL_ERROR "Unsupported metadata backend: ${IMAGE_METADATA_BACKEND}")
 endif()
+
+find_package(OpenCV REQUIRED core dnn imgcodecs)
