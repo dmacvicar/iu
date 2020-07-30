@@ -63,7 +63,7 @@ int index_directory_recursive(const index_opts &opts)
 
         // places
         if (opts.detect_place_names && md.location) {
-            spdlog::debug("GPS {} {}", std::get<0>(md.location.value()), std::get<1>(md.location.value()));
+            spdlog::debug("GPS {:.2f} {:.2f}", std::get<0>(md.location.value()), std::get<1>(md.location.value()));
             auto lat = std::get<0>(md.location.value());
             auto lon = std::get<1>(md.location.value());
             auto maybe_text = location_text(lat, lon);
