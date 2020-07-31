@@ -26,7 +26,7 @@ std::vector<std::string> read_names(const std::string& filename)
 
 int detect_objects(std::set<std::string> &detected_labels, const fs::path p)
 {
-    cv::dnn::Net net = cv::dnn::readNet("bvlc_googlenet.caffemodel", "bvlc_googlenet.prototxt");
+    static cv::dnn::Net net = cv::dnn::readNet("bvlc_googlenet.caffemodel", "bvlc_googlenet.prototxt");
     if (net.empty()) {
         spdlog::error("There are no layers in the network");
         return -1;
