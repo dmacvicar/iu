@@ -11,7 +11,7 @@ namespace iu {
 
 constexpr auto INDEX_PATH = "./index_data";
 
-int search(const std::string &query_str, std::function<void(const std::string)>  cb)
+void search(const std::string &query_str, std::function<void(const std::string)>  cb)
 {
     try {
         std::string path(INDEX_PATH);
@@ -45,11 +45,9 @@ int search(const std::string &query_str, std::function<void(const std::string)> 
             cb(doc.get_value(FIELD_ID_NO));
         }
 
-    } catch(const Xapian::Error e) {
-        std::cerr << e.get_description() << std::endl;
-        return -1;
+    } catch (const Xapian::Error &e) {
+        throw std::runtime_error(fmt::format("Search failed. Xapian: {}", e.get_msg()));
     }
-    return 0;
 }
 
 } // namespace iu

@@ -24,7 +24,7 @@ namespace fs = std::filesystem;
 
 extern int file_gather_metadata(const index_opts &opts, image_metadata &md, const fs::path &file_path);
 
-int index_directory_recursive(const index_opts &opts)
+void index_directory_recursive(const index_opts &opts)
 {
     Xapian::WritableDatabase db(std::string(INDEX_PATH), Xapian::DB_CREATE_OR_OPEN);
     Xapian::TermGenerator indexer;
@@ -52,8 +52,8 @@ int index_directory_recursive(const index_opts &opts)
         image_metadata md;
         // call the compile-time backend version
         if (file_gather_metadata(opts, md, p.path()) != 0) {
-            spdlog::error("Error while indexing {} metadata", p.path().string());
-            //continue;
+            // we only log this error, but still move forward with other metadata
+            spdlog::error("Error while gathering metadata: {}", p.path().string());
         }
 
         // camera
@@ -63,7 +63,7 @@ int index_directory_recursive(const index_opts &opts)
 
         // places
         if (opts.detect_place_names && md.location) {
-            spdlog::debug("GPS {:.2f} {:.2f}", std::get<0>(md.location.value()), std::get<1>(md.location.value()));
+            spdlog::debug("Location {:.2f}, {:.2f}", std::get<0>(md.location.value()), std::get<1>(md.location.value()));
             auto lat = std::get<0>(md.location.value());
             auto lon = std::get<1>(md.location.value());
             auto maybe_text = location_text(lat, lon);
@@ -81,8 +81,10 @@ int index_directory_recursive(const index_opts &opts)
         // object detection
         if (opts.detect_objects) {
             std::set<std::string> labels;
-            if (detect_objects(labels, p.path().string()) != 0) {
-                spdlog::error("Failed to execute classify the image");
+            try {
+                detect_objects(labels, p.path().string());
+            } catch(...) {
+                std::throw_with_nested(std::runtime_error("Failed to execute image classifier"));
             }
 
             for (auto label: labels) {
@@ -108,7 +110,6 @@ int index_directory_recursive(const index_opts &opts)
     if (failed_count > 0) {
         std::cout << "failed: " << failed_count << " files" << std::endl;
     }
-    return 0;
 }
 
 } // namespace iu

@@ -3,10 +3,10 @@
 #include <sstream>
 
 #include <spdlog/spdlog.h>
-
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/dnn.hpp>
 
+#include "resources.hpp"
 #include "detect_objects.hpp"
 
 namespace iu {
@@ -24,12 +24,16 @@ std::vector<std::string> read_names(const std::string& filename)
     return names;
 }
 
-int detect_objects(std::set<std::string> &detected_labels, const fs::path p)
+void detect_objects(std::set<std::string> &detected_labels, const fs::path p)
 {
-    static cv::dnn::Net net = cv::dnn::readNet("bvlc_googlenet.caffemodel", "bvlc_googlenet.prototxt");
+    static auto model_filepath = find_resource("bvlc_googlenet.caffemodel");
+    if (!model_filepath) {
+        throw std::runtime_error("Can't find model data, used for image classification");
+    }
+
+    static cv::dnn::Net net = cv::dnn::readNet(*model_filepath, "bvlc_googlenet.prototxt");
     if (net.empty()) {
-        spdlog::error("There are no layers in the network");
-        return -1;
+        throw std::runtime_error(fmt::format("Loaded network '{}' has no layers", (*model_filepath).string()));
     }
     static std::vector<std::string> labels;
     if (labels.empty()) {
@@ -38,14 +42,12 @@ int detect_objects(std::set<std::string> &detected_labels, const fs::path p)
 
     cv::Mat img = cv::imread(p.string());
     if (img.data == nullptr) {
-        spdlog::error("Can't read {}", p.string());
-        return -1;
+        throw std::runtime_error(fmt::format("Can't read {}", p.string()));
     }
     // Create 4-dimensional blob from the image and set it as the input to the DNN
     cv::Mat blob = cv::dnn::blobFromImage(img, 1, cv::Size(224, 224), cv::Scalar(104, 117, 123));
     if (blob.empty()) {
-        spdlog::error("Can't create blob from {}", p.string());
-        return -1;
+        throw std::runtime_error(fmt::format("Can't create blob from {}", p.string()));
     }
 
     net.setInput(blob);
@@ -68,7 +70,6 @@ int detect_objects(std::set<std::string> &detected_labels, const fs::path p)
         }
         spdlog::debug("{} - probability: {}", label_terms, probability);
     }
-    return 0;
 }
 
 } // namespace iu

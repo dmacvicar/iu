@@ -28,11 +28,17 @@ void load_location_countries(std::map<std::string, std::string> &countries) {
                  csv2::first_row_is_header<false>,
                  csv2::trim_policy::trim_whitespace> csv;
     if (csv.mmap(countries_csv->string())) {
+        int line = 0;
         for (const auto row: csv) {
+            line++;
             auto it = row.begin();
             std::string key, name;
             (*it).read_value(key); ++it;
             (*it).read_value(name);
+            if (key.empty() || name.empty()) {
+                spdlog::warn("Coult not parse '{}': line {}", countries_csv->string(), line);
+                break;
+            }
             countries.insert(std::pair<std::string, std::string>(key, name));
         }
     }
@@ -54,22 +60,26 @@ void load_location_geos(std::vector<std::tuple<double, double, std::string, std:
     csv2::Reader<csv2::delimiter<','>,
                  csv2::quote_character<'\"'>,
                  csv2::first_row_is_header<false>,
-                 csv2::trim_policy::trim_whitespace> csv;
+                 csv2::trim_policy::no_trimming> csv;
     if (csv.mmap(geocode_csv->string())) {
+        int line = 0;
         for (const auto row: csv) {
+            line++;
             auto it = row.begin();
             std::string lats, lons, cc, name;
             (*it).read_value(lats); ++it;
             (*it).read_value(lons); ++it;
             (*it).read_value(cc); ++it;
-            (*it).read_value(name);
+            (*it).read_value(name); ++it;
             try {
                 geo.push_back(std::make_tuple(std::stod(lats), std::stod(lons), cc, name));
             } catch (std::invalid_argument e) {
-                spdlog::error("Could not convert {} {} {} {} to numbers", lats, lons, cc, name);
+                spdlog::warn("Coult not parse '{}': line {}", geocode_csv->string(), line);
                 continue;
             }
         }
+    } else {
+        throw std::runtime_error(fmt::format("Unable to parse geocode data: '{}'", (*geocode_csv).string()));
     }
     spdlog::debug("Loaded {} locations", geo.size());
 }

@@ -38,6 +38,6 @@ struct index_opts {
     bool detect_place_names = true;
 };
 
-int index_directory_recursive(const index_opts &opts);
+void index_directory_recursive(const index_opts &opts);
 
 } // namespace iu
