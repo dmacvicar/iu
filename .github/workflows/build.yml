@@ -23,26 +23,25 @@ jobs:
       uses: actions/checkout@v2
       with:
         submodules: 'recursive'
-    - name: Install package dependencies
-      id: cmake_and_ninja
-      shell: cmake -P {0}
+    - if: ${{ runner.os == 'Linux' }}
+      name: Install package dependencies (Linux)
       run: |
-        if ("${{ runner.os }}" STREQUAL "Linux")
-          execute_process(COMMAND sudo apt-get update)
-          execute_process(COMMAND sudo apt-get install clang-tidy)
-          execute_process(COMMAND sudo apt-get install libxapian-dev)
-          execute_process(COMMAND sudo apt-get install libexif-dev)
-          execute_process(COMMAND sudo apt-get install libopencv-dev libopencv-dnn-dev)
-          execute_process(COMMAND sudo apt-get install ninja-build)
-        elseif ("${{ runner.os }}" STREQUAL "macOS")
-          execute_process(COMMAND brew install pkg-config)
-          execute_process(COMMAND brew install libexif)
-          execute_process(COMMAND brew install xapian)
-          execute_process(COMMAND brew install opencv)
-          execute_process(COMMAND brew install ninja)
+        sudo apt-get update
+        sudo apt-get install clang-tidy
+        sudo apt-get install libxapian-dev
+        sudo apt-get install libexif-dev
+        sudo apt-get install libopencv-dev libopencv-dnn-dev
+        sudo apt-get install ninja-build
+    - if: ${{ runner.os == 'macOS' }}
+      name: Install package dependencies (macOS)
+      run: |
+        brew install pkg-config
+        brew install libexif
+        brew install xapian
+        brew install opencv
+        brew install ninja
         endif()
     - name: Configure
-      shell: cmake -P {0}
       run: |
         set(ENV{CC} ${{ matrix.config.cc }})
         set(ENV{CXX} ${{ matrix.config.cxx }})
