@@ -10,8 +10,8 @@ jobs:
       fail-fast: false
       matrix:
         config:
-        - name: "Ubuntu Latest GCC"
-          os: ubuntu-latest
+        - name: "Ubuntu 20.04 GCC"
+          os: ubuntu-20.04
           cc: "gcc-9"
           cxx: "g++-9"
         - name: "macOS Latest Clang"
