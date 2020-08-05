@@ -32,7 +32,7 @@ jobs:
           execute_process(COMMAND sudo apt-get install clang-tidy)
           execute_process(COMMAND sudo apt-get install libxapian-dev)
           execute_process(COMMAND sudo apt-get install libexif-dev)
-          execute_process(COMMAND sudo apt-get install libopencv-dev)
+          execute_process(COMMAND sudo apt-get install libopencv-dev libopencv-dnn-dev)
           execute_process(COMMAND sudo apt-get install ninja-build)
         elseif ("${{ runner.os }}" STREQUAL "macOS")
           execute_process(COMMAND brew install pkg-config)
