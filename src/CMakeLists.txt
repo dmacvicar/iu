@@ -9,7 +9,7 @@ set(libiu_SOURCES
   find.cpp
   index.cpp
   resources.cpp
-  index_${IMAGE_METADATA_BACKEND}.cpp
+  index_libexif.cpp
   gps.cpp
   detect_objects.cpp
   )
@@ -19,11 +19,7 @@ set_target_properties(libiu PROPERTIES
   CXX_STANDARD 17
 )
 target_link_libraries(libiu xapian)
-if(IMAGE_METADATA_BACKEND STREQUAL "exiv2")
-  target_link_libraries(libiu ${LIBEXIV2_LIBRARIES})
-elseif (IMAGE_METADATA_BACKEND STREQUAL "libexif")
-  target_link_libraries(libiu ${LIBEXIF_LIBRARIES})
-endif()
+target_link_libraries(libiu ${LIBEXIF_LIBRARIES})
 # FIXME not working
 #target_link_libraries(libiu ${OpenCV_LIBS})
 target_link_libraries(libiu opencv_core opencv_dnn opencv_imgcodecs)
