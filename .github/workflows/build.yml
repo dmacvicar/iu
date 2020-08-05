@@ -40,7 +40,6 @@ jobs:
         brew install xapian
         brew install opencv
         brew install ninja
-        endif()
     - name: Configure
       run: |
         set(ENV{CC} ${{ matrix.config.cc }})
