@@ -1,6 +1,8 @@
 
 # iu
 
+![Build](https://github.com/dmacvicar/iu/workflows/Build/badge.svg)
+
 "iu" is a tool to search and browse your image collection.
 
 The name comes from "mu", which is a mail indexer that inspired this project.
