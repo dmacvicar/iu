@@ -1,5 +1,6 @@
 #include <cstdlib>
 #include <string>
+#include <sstream>
 #include <filesystem>
 #include <map>
 #include <vector>
