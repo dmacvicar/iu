@@ -53,5 +53,5 @@ include_directories(${FMT_SOURCE_DIR}/include)
 include_directories(${spdlog_SOURCE_DIR}/include)
 include_directories(${csv2_SOURCE_DIR}/include)
 include_directories(${OpenCV_INCLUDE_DIRS})
-include_directories(${XAPIAN_INCLUDE_DIRS})
+include_directories(${XAPIAN_INCLUDE_DIR})
 
