@@ -22,6 +22,9 @@ set_target_properties(libiu PROPERTIES
 include(FindPkgConfig)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(LIBEXIF REQUIRED libexif)
+message(STATUS "Libexif library status:")
+message(STATUS "    libraries: ${LIBEXIF_LIBRARIES}")
+message(STATUS "    include path: ${LIBEXIF_INCLUDEDIR}")
 target_link_libraries(libiu ${LIBEXIF_LIBRARIES})
 
 find_package(OpenCV REQUIRED core dnn imgcodecs)
@@ -53,4 +56,6 @@ include_directories(${spdlog_SOURCE_DIR}/include)
 include_directories(${csv2_SOURCE_DIR}/include)
 include_directories(${OpenCV_INCLUDE_DIRS})
 include_directories(${XAPIAN_INCLUDE_DIR})
+include_directories(${LIBEXIF_INCLUDEDIR})
+
 
