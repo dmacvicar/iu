@@ -18,11 +18,23 @@ add_library(libiu STATIC ${libiu_SOURCES})
 set_target_properties(libiu PROPERTIES
   CXX_STANDARD 17
 )
-target_link_libraries(libiu ${XAPIAN_LIBRARIES})
+
+include(FindPkgConfig)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(LIBEXIF REQUIRED libexif)
 target_link_libraries(libiu ${LIBEXIF_LIBRARIES})
-# FIXME not working
-#target_link_libraries(libiu ${OpenCV_LIBS})
-target_link_libraries(libiu opencv_core opencv_dnn opencv_imgcodecs)
+
+find_package(OpenCV REQUIRED core dnn imgcodecs)
+message(STATUS "OpenCV library status:")
+message(STATUS "    config: ${OpenCV_DIR}")
+message(STATUS "    version: ${OpenCV_VERSION}")
+message(STATUS "    libraries: ${OpenCV_LIBS}")
+message(STATUS "    include path: ${OpenCV_INCLUDE_DIRS}")
+#target_link_libraries(libiu opencv_core opencv_dnn opencv_imgcodecs)
+target_link_libraries(libiu ${OpenCV_LIBS})
+
+find_package(xapian REQUIRED)
+target_link_libraries(libiu ${XAPIAN_LIBRARIES})
 
 add_executable(iu
   main.cpp
