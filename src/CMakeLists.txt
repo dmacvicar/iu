@@ -37,7 +37,6 @@ find_package(xapian REQUIRED)
 message(STATUS "Xapian library status:")
 message(STATUS "    libraries: ${XAPIAN_LIBRARIES}")
 message(STATUS "    include path: ${XAPIAN_INCLUDE_DIR}")
-
 target_link_libraries(libiu ${XAPIAN_LIBRARIES})
 
 add_executable(iu
