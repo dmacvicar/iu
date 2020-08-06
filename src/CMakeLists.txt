@@ -21,11 +21,11 @@ set_target_properties(libiu PROPERTIES
 
 include(FindPkgConfig)
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(LIBEXIF REQUIRED libexif)
+pkg_check_modules(LIBEXIF REQUIRED IMPORTED_TARGET libexif)
 message(STATUS "Libexif library status:")
 message(STATUS "    libraries: ${LIBEXIF_LIBRARIES}")
 message(STATUS "    include path: ${LIBEXIF_INCLUDEDIR}")
-target_link_libraries(libiu ${LIBEXIF_LIBRARIES})
+target_link_libraries(libiu PkgConfig::LIBEXIF)
 
 find_package(OpenCV REQUIRED core dnn imgcodecs)
 message(STATUS "OpenCV library status:")
