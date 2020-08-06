@@ -50,7 +50,6 @@ jobs:
           COMMAND ${CMAKE_COMMAND}
             -S .
             -B build
-            -D TIDY=ON
             -D CMAKE_BUILD_TYPE=$ENV{BUILD_TYPE}
             -G Ninja
             -D CMAKE_MAKE_PROGRAM=ninja
