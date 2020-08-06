@@ -36,3 +36,4 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(LIBEXIF REQUIRED libexif)
 
 find_package(OpenCV REQUIRED core dnn imgcodecs)
+find_package(xapian REQUIRED)

@@ -18,7 +18,7 @@ add_library(libiu STATIC ${libiu_SOURCES})
 set_target_properties(libiu PROPERTIES
   CXX_STANDARD 17
 )
-target_link_libraries(libiu xapian)
+target_link_libraries(libiu ${XAPIAN_LIBRARIES})
 target_link_libraries(libiu ${LIBEXIF_LIBRARIES})
 # FIXME not working
 #target_link_libraries(libiu ${OpenCV_LIBS})
@@ -37,3 +37,5 @@ include_directories(${FMT_SOURCE_DIR}/include)
 include_directories(${spdlog_SOURCE_DIR}/include)
 include_directories(${csv2_SOURCE_DIR}/include)
 include_directories(${OpenCV_INCLUDE_DIRS})
+include_directories(${XAPIAN_INCLUDE_DIRS})
+
