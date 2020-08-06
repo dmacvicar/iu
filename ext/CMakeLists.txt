@@ -33,12 +33,6 @@ FetchContent_MakeAvailable(catch2)
 
 include(FindPkgConfig)
 find_package(PkgConfig REQUIRED)
-if(IMAGE_METADATA_BACKEND STREQUAL "exiv2")
-  pkg_check_modules(LIBEXIV2 REQUIRED exiv2)
-elseif (IMAGE_METADATA_BACKEND STREQUAL "libexif")
-  pkg_check_modules(LIBEXIF REQUIRED libexif)
-else()
-  message(FATAL_ERROR "Unsupported metadata backend: ${IMAGE_METADATA_BACKEND}")
-endif()
+pkg_check_modules(LIBEXIF REQUIRED libexif)
 
 find_package(OpenCV REQUIRED core dnn imgcodecs)
