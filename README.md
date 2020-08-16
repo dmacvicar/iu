@@ -48,13 +48,34 @@ cmake -S . -B build
 cmake --build build
 ```
 
+or
+
+```
+$ cd build
+cmake ..
+make
+```
+
 # Running
+
+## Getting data files
+
+```
+cmake --build build --target data
+```
+
+or..
+
+```
+$ cd build
+$ make data
+```
 
 ## Indexing images
 
 ```
-# libexif
-$ build/src/iu index --root ~/Pictures
+$ cd build
+$ src/iu index --root ~/Pictures
 ...
 indexed: 15465 files
 ```
@@ -62,7 +83,8 @@ indexed: 15465 files
 ## Search
 
 ```
-$ build/src/iu find "camera:powershot"
+$ cd build
+$ src/iu find "camera:powershot"
 8725 result found
 0: docid /home/foo/1.jpg
 ...
@@ -73,8 +95,8 @@ sys     0m0.005s
 
 # Performance
 
-Without many optimizations, I can index 15k files (50G) in 2.7s on a old X230 laptop with SSD (libexif backend).
-Adding offline geolocation over 121k places brings that up to 16s.
+* Without many optimizations, I can index 15k files (50G) in 2.7s on a old X230 laptop with SSD (libexif backend).
+* Adding offline geolocation over 121k places brings that up to 16s.
 
 # Implementation Notes
 
@@ -84,7 +106,13 @@ Uses data from [reverse_geocode](https://github.com/richardpenman/reverse_geocod
 
 It is a dumb search by distance and it is not optimized yet.
 
+## Automatic labeling
+
+Uses [Berkeley Vision and Learning Center Caffe](https://caffe.berkeleyvision.org/) GoogleNet model, and the word list from [ImageNet](http://www.image-net.org).
+
 # License
+
+* (C)2020 Duncan Mac-Vicar P.
 
 * "iu" is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
 
