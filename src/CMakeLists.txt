@@ -12,6 +12,7 @@ set(libiu_SOURCES
   index_libexif.cpp
   gps.cpp
   detect_objects.cpp
+  detect_quality.cpp
   )
 
 add_library(libiu STATIC ${libiu_SOURCES})

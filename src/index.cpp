@@ -15,6 +15,7 @@
 #include "index.hpp"
 #include "gps.hpp"
 #include "detect_objects.hpp"
+#include "detect_quality.hpp"
 
 namespace iu {
 
@@ -90,6 +91,19 @@ void index_directory_recursive(const index_opts &opts)
             for (auto label: labels) {
                 indexer.index_text(label, 1, object_prefix);
             }
+        }
+
+        // blurry images
+        try {
+            auto blurry = detect_quality(p.path().string());
+
+            spdlog::error("Blurry: {}", blurry);
+            if (blurry < 15) {
+                indexer.index_text("blurry", 1, "");
+            }
+
+        } catch(...) {
+            std::throw_with_nested(std::runtime_error("Failed to execute image blurry classifier"));
         }
 
         // date
