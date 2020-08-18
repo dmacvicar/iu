@@ -1,3 +1,9 @@
+import argparse
+
+parser = argparse.ArgumentParser(description='Convert words file')
+parser.add_argument('--output')
+args = parser.parse_args()
+
 # generates a subset of words.txt containing the synset 1000 words
 # plus all the parent relationship words
 
@@ -22,5 +28,11 @@ with open('words.txt') as f:
 with open('wordnet.is_a.txt') as f:
     parents = dict({x[1].strip():x[0].strip() for x in (line.split(' ') for line in f.readlines())})
 
-for identifier in synset:
-    print(expand_words(words, identifier, parents))
+
+if args.output is None:
+    for identifier in synset:
+        print(expand_words(words, identifier, parents))
+else:
+    with open(args.output, 'w') as f:
+        for identifier in synset:
+            print(expand_words(words, identifier, parents), file=f)

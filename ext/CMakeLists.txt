@@ -39,29 +39,33 @@ FetchContent_Declare(reverse_geocode
 FetchContent_MakeAvailable(reverse_geocode)
 
 add_custom_command(
-  OUTPUT "${CMAKE_BINARY_DIR}/bvlc_googlenet.caffemodel"
-  OUTPUT "${CMAKE_BINARY_DIR}/bvlc_googlenet.prototxt"
-  OUTPUT "${CMAKE_BINARY_DIR}/coutries.csv"
-  OUTPUT "${CMAKE_BINARY_DIR}/geocode.csv"
-  OUTPUT "${CMAKE_BINARY_DIR}/words.txt"
-  OUTPUT "${CMAKE_BINARY_DIR}/wordnet.is_a.txt"
-  COMMAND ${CMAKE_COMMAND} -P "${CMAKE_CURRENT_SOURCE_DIR}/download_data.cmake"
+  OUTPUT
+  ${CMAKE_BINARY_DIR}/bvlc_googlenet.prototxt
+  ${CMAKE_BINARY_DIR}/bvlc_googlenet.caffemodel
+  ${CMAKE_BINARY_DIR}/coutries.csv
+  ${CMAKE_BINARY_DIR}/geocode.csv
+  ${CMAKE_BINARY_DIR}/words.txt
+  ${CMAKE_BINARY_DIR}/wordnet.is_a.txt
+  COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/download_data.cmake
+  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 )
 
-find_package(PYthon3 COMPONENTS Interpreter)
+find_package(Python3)
 add_custom_command(
-  OUTPUT "${CMAKE_BINARY_DIR}/words_full_hierarchy.txt"
-  COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/generate.py"
-  WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+  OUTPUT ${CMAKE_BINARY_DIR}/words_full_hierarchy.txt
+  COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/generate.py --output ${CMAKE_BINARY_DIR}/words_full_hierarchy.txt
+  DEPENDS ${CMAKE_BINARY_DIR}/words.txt ${CMAKE_BINARY_DIR}/wordnet.is_a.txt
+  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 )
 
 add_custom_target(data
-  DEPENDS "${CMAKE_BINARY_DIR}/bvlc_googlenet.caffemodel"
-  "${CMAKE_BINARY_DIR}/bvlc_googlenet.prototxt"
-  "${CMAKE_BINARY_DIR}/geocode.csv"
-  "${CMAKE_BINARY_DIR}/countries.csv"
-  "${CMAKE_BINARY_DIR}/wordnet.is_a.txt"
-  "${CMAKE_BINARY_DIR}/words.txt"
-  "${CMAKE_BINARY_DIR}/words_full_hierarchy.txt"
+  DEPENDS
+  ${CMAKE_BINARY_DIR}/words_full_hierarchy.txt
+  ${CMAKE_BINARY_DIR}/bvlc_googlenet.prototxt
+  ${CMAKE_BINARY_DIR}/bvlc_googlenet.caffemodel
+  ${CMAKE_BINARY_DIR}/geocode.csv
+  ${CMAKE_BINARY_DIR}/countries.csv
+  ${CMAKE_BINARY_DIR}/wordnet.is_a.txt
+  ${CMAKE_BINARY_DIR}/words.txt
 )
 
