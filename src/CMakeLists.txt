@@ -13,6 +13,8 @@ set(libiu_SOURCES
   gps.cpp
   detect_objects.cpp
   detect_quality.cpp
+  # opencv contrib
+  ${CMAKE_BINARY_DIR}/_deps/opencv_contrib-src/modules/quality/src/qualitybrisque.cpp
   )
 
 add_library(libiu STATIC ${libiu_SOURCES})
@@ -28,7 +30,7 @@ message(STATUS "    libraries: ${LIBEXIF_LIBRARIES}")
 message(STATUS "    include path: ${LIBEXIF_INCLUDEDIR}")
 target_link_libraries(libiu PkgConfig::LIBEXIF)
 
-find_package(OpenCV REQUIRED core dnn imgcodecs)
+find_package(OpenCV REQUIRED core dnn imgcodecs ml)
 message(STATUS "OpenCV library status:")
 message(STATUS "    config: ${OpenCV_DIR}")
 message(STATUS "    version: ${OpenCV_VERSION}")
@@ -58,5 +60,6 @@ include_directories(${csv2_SOURCE_DIR}/include)
 include_directories(${OpenCV_INCLUDE_DIRS})
 include_directories(${XAPIAN_INCLUDE_DIR})
 include_directories(${LIBEXIF_INCLUDEDIR})
-
+# opencv module quality
+include_directories(${CMAKE_BINARY_DIR}/_deps/opencv_contrib-src/modules/quality/include)
 

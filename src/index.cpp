@@ -98,7 +98,7 @@ void index_directory_recursive(const index_opts &opts)
             auto blurry = detect_quality(p.path().string());
 
             spdlog::error("Blurry: {}", blurry);
-            if (blurry < 15) {
+            if (blurry > 60) {
                 indexer.index_text("blurry", 1, "");
             }
 

@@ -38,6 +38,13 @@ FetchContent_Declare(reverse_geocode
 )
 FetchContent_MakeAvailable(reverse_geocode)
 
+FetchContent_Declare(opencv_contrib
+  GIT_REPOSITORY https://github.com/opencv/opencv_contrib.git
+  GIT_SHALLOW ON
+#  SOURCE_SUBDIR modules/quality
+)
+FetchContent_MakeAvailable(opencv_contrib)
+
 add_custom_command(
   OUTPUT
   ${CMAKE_BINARY_DIR}/bvlc_googlenet.prototxt

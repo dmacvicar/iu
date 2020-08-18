@@ -110,6 +110,12 @@ It is a dumb search by distance and it is not optimized yet.
 
 Uses [Berkeley Vision and Learning Center Caffe](https://caffe.berkeleyvision.org/) GoogleNet model, and the word list from [ImageNet](http://www.image-net.org).
 
+## Quality classification
+
+Uses the BRISQUE (Blind/Referenceless Image Spatial Quality Evaluator), a No Reference Image Quality Assessment (NR-IQA) algorithm as in implemented in OpenCV contrib.
+
+We use the trained model provided in the /samples/ directory, trained on the LIVE-R2 database as in the original implementation.
+
 # License
 
 * (C)2020 Duncan Mac-Vicar P.
