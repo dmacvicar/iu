@@ -94,10 +94,11 @@ void index_directory_recursive(const index_opts &opts)
 
         // date
         if (md.date_time) {
-            char buf[2000];
-            std::strftime(buf, sizeof(buf), "%Y%m%d", &md.date_time.value());
-            spdlog::debug("date: {}", buf);
-            doc.add_value(FIELD_DATE_NO, buf);
+            std::array<char, 2000> buf;
+            auto len = std::strftime(buf.data(), buf.size(), "%Y%m%d", &md.date_time.value());
+            auto date = std::string(buf.data(), len);
+            spdlog::debug("date: {}", date);
+            doc.add_value(FIELD_DATE_NO, date);
         }
 
         std::string idterm(file_prefix + p.path().string());
