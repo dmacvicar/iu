@@ -5,6 +5,7 @@
 #include <spdlog/spdlog.h>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/dnn.hpp>
+#include <csv2/reader.hpp>
 
 #include "resources.hpp"
 #include "detect_objects.hpp"
@@ -13,19 +14,28 @@ namespace iu {
 
 namespace fs = std::filesystem;
 
+// imagenet default
 constexpr int NUM_LABELS = 1000;
 
-std::vector<std::string> read_names(const std::string& filename)
+template <class Container>
+void read_names(Container &names, const fs::path& filename)
 {
-    std::ifstream in; in.open(filename);
-    std::vector<std::string> names(NUM_LABELS);
-    for(int i = 0; i < NUM_LABELS; i++)
-        std::getline(in, names[i]);
-    return names;
+    std::ifstream in(filename.string());
+    std::string name;
+    auto it = std::inserter(names, names.end());
+    while (std::getline(in, name)) {
+        it = name;
+    }
 }
 
 void detect_objects(std::set<std::string> &detected_labels, const fs::path p)
 {
+    // contains words for every concept
+    static auto words_filepath = find_resource("words_full_hierarchy.txt");
+    if (!words_filepath) {
+        throw std::runtime_error("Can't find synset words list, used for image classification");
+    }
+
     static auto model_filepath = find_resource("bvlc_googlenet.caffemodel");
     if (!model_filepath) {
         throw std::runtime_error("Can't find model data, used for image classification");
@@ -35,9 +45,12 @@ void detect_objects(std::set<std::string> &detected_labels, const fs::path p)
     if (net.empty()) {
         throw std::runtime_error(fmt::format("Loaded network '{}' has no layers", (*model_filepath).string()));
     }
+
     static std::vector<std::string> labels;
+    labels.reserve(NUM_LABELS);
     if (labels.empty()) {
-        labels = read_names("classification_classes_ILSVRC2012.txt");
+        read_names(labels, *words_filepath);
+        spdlog::debug("Loaded {} image words", labels.size());
     }
 
     cv::Mat img = cv::imread(p.string());
@@ -58,17 +71,16 @@ void detect_objects(std::set<std::string> &detected_labels, const fs::path p)
         auto probability = prob.at<float>(sorted_idx.at<int>(i));
         auto label_terms = labels[sorted_idx.at<int>(i)];
 
+        spdlog::debug("{} - probability: {}", label_terms, probability);
         if (probability < 0.48) {
             continue;
         }
-
         // every class has multiple words separated by comma
         std::stringstream str(label_terms);
         std::string term;
         while (std::getline(str, term, ',')) {
             detected_labels.insert(term);
         }
-        spdlog::debug("{} - probability: {}", label_terms, probability);
     }
 }
 
