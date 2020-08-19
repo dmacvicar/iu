@@ -27,6 +27,8 @@ The name comes from ["mu"](https://www.djcbsoftware.nl/code/mu/), which is a mai
 - Some fancy indexing features I expect to add at some point:
   - [X] Offline reverse geo-location: Turn GPS data into places names
   - [X] Offline automatic tagging: Recognize basic objects (food, guitars, animals, bikes, cars, colors) and index on the object word
+  - [ ] Search similar images, to detect duplicates while sorting my collection
+  - [ ] Find images with low quality, to be used when curating my camera inbox
   - [ ] OCR, index on words in the image
   - [ ] Recognize people and index them
 - [X] Ultra fast searching
@@ -118,15 +120,31 @@ Uses data from [reverse_geocode](https://github.com/richardpenman/reverse_geocod
 
 It is a dumb search by distance and it is not optimized yet.
 
+Right now the technique is that we convert the photo location into a label (place name) and add this name to the index as a term. Therefore the place is passed into the query.
+
+An alternative approach I am exploring is to allow to pass the place as part of a command line, separate from the query, and use Xapian geospatial (ie. `LatLongDistancePostingSource`), adding this posting source to the query object.
+
+I will start this exploration by adding the location as a value to the document.
+
 ## Automatic labeling
 
 Uses [Berkeley Vision and Learning Center Caffe](https://caffe.berkeleyvision.org/) GoogleNet model, and the word list from [ImageNet](http://www.image-net.org).
+
+I would still like to allow to drop models and labels list in a directory and have the indexer pick it up automatically.
 
 ## Quality classification
 
 Uses the BRISQUE (Blind/Referenceless Image Spatial Quality Evaluator), a No Reference Image Quality Assessment (NR-IQA) algorithm as in implemented in OpenCV contrib.
 
 We use the trained model provided in the /samples/ directory, trained on the LIVE-R2 database as in the original implementation.
+
+Right now we don't do anything with this except of adding the word "blurry" to the index. In theory I should add this as a value.
+
+## Browsing photos
+
+Right now if you add "-b" (browse) to a search, it will pass the list of files in the result to `eog`. This does not work well, as there is a limit on the number of files, and if there are no results, `eog` will still show other files. I am looking for a good replacement.
+
+Hopefully I don't need to write my own.
 
 # License
 
