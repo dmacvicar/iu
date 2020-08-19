@@ -100,6 +100,18 @@ sys     0m0.005s
 
 # Implementation Notes
 
+# Technologies
+
+* Indexing is built on top of [Xapian](https://xapian.org/), a free and open-source probabilistic information retrieval library.
+
+ The idea of using [SQLite] was considered too.
+
+* Metadata from photos is retrieved using [libexif](https://libexif.github.io).
+
+  exiv2 was tested and while the API and format coverage was wider, it was much slower.
+
+* Examination of images is done with the help of [Open Computer Vision Library](https://opencv.org).
+
 ## Reverse geocoding index
 
 Uses data from [reverse_geocode](https://github.com/richardpenman/reverse_geocode), which is turn, comes from [geonames.org](https://geonames.org). [CC-By licence](http://creativecommons.org/licenses/by/4.0/).
