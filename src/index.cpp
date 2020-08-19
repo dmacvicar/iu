@@ -106,7 +106,7 @@ void index_directory_recursive(const index_opts &opts)
         // image quality: 0 best, 100 worst
         try {
             auto quality = detect_quality(p.path().string());
-            spdlog::error("quality: {}", quality);
+            spdlog::debug("quality: {}", quality);
             doc.add_value(FIELD_QUALITY_NO, Xapian::sortable_serialise(quality));
 
         } catch(...) {
