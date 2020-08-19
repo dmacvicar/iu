@@ -44,8 +44,8 @@ int main(int argc, char* argv[])
         ->required()
         ->check(CLI::ExistingDirectory);
 
-    index->add_flag("-e,--index-entity-names,!--skip-index-entity-names", index_opts.index_entity_names, "Index entities despicted in pictures by name");
-    index->add_flag("-d,--index-location-names-,!--skip-index-location-names", index_opts.index_location_names, "Index locations by their name");
+    index->add_flag("-e,--index-entities,!--skip-index-entities", index_opts.index_entity_names, "Index entities despicted in pictures");
+    index->add_flag("-d,--index-places,!--skip-index-places", index_opts.index_location_names, "Index locations by their name (places)");
 
     std::string query;
     find->add_option("query", query, "Query")->required();
