@@ -18,7 +18,7 @@ struct image_metadata {
 };
 
 constexpr auto FIELD_CAMERA_PREFIX = "C";
-constexpr auto FIELD_OBJECT_PREFIX = "O";
+constexpr auto FIELD_ENTITY_PREFIX = "XE";
 constexpr auto FIELD_PLACE_PREFIX = "P";
 constexpr auto FIELD_FILE_PREFIX = "Q";
 constexpr auto FIELD_DATE_PREFIX = "D";
@@ -27,7 +27,7 @@ constexpr auto FIELD_LOCATION_PREFIX = "XL";
 
 constexpr auto FIELD_CAMERA_NAME = "camera";
 constexpr auto FIELD_PLACE_NAME = "place";
-constexpr auto FIELD_OBJECT_NAME = "object";
+constexpr auto FIELD_ENTITY_NAME = "entity";
 constexpr auto FIELD_FILE_NAME = "file";
 constexpr auto FIELD_DATE_NAME = "date";
 constexpr auto FIELD_QUALITY_NAME = "quality";
@@ -40,8 +40,8 @@ constexpr auto FIELD_LOCATION_NO = 4;
 
 struct index_opts {
     std::string root = fs::current_path();
-    bool detect_objects = false;
-    bool detect_place_names = true;
+    bool index_entity_names = false;
+    bool index_location_names = true;
 };
 
 void index_directory_recursive(const index_opts &opts);

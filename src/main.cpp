@@ -35,6 +35,7 @@ int main(int argc, char* argv[])
 
     CLI::App *index = app.add_subcommand("index", "Index images");
     CLI::App *find = app.add_subcommand("find", "Query the image database");
+    CLI::App *locations = app.add_subcommand("locations", "Show all locations");
     app.require_subcommand();
 
     iu::index_opts index_opts;
@@ -43,8 +44,8 @@ int main(int argc, char* argv[])
         ->required()
         ->check(CLI::ExistingDirectory);
 
-    index->add_flag("-o,--detect-objects,!--skip-detect-objects", index_opts.detect_objects, "Detect object names");
-    index->add_flag("-d,--detect-places,!--skip-detect-places", index_opts.detect_place_names, "Detect places names");
+    index->add_flag("-e,--index-entity-names,!--skip-index-entity-names", index_opts.index_entity_names, "Index entities despicted in pictures by name");
+    index->add_flag("-d,--index-location-names-,!--skip-index-location-names", index_opts.index_location_names, "Index locations by their name");
 
     std::string query;
     find->add_option("query", query, "Query")->required();
@@ -75,6 +76,8 @@ int main(int argc, char* argv[])
                                           std::cout << result << std::endl;
                                       });
                 }
+            } else if (subcom == locations) {
+                
             }
         }
     }

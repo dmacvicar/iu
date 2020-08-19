@@ -26,7 +26,7 @@ The name comes from ["mu"](https://www.djcbsoftware.nl/code/mu/), which is a mai
   - [ ] Album (?)
 - Some fancy indexing features I expect to add at some point:
   - [X] Offline reverse geo-location: Turn GPS data into places names
-  - [X] Offline automatic tagging: Recognize basic objects (food, guitars, animals, bikes, cars, colors) and index on the object word
+  - [X] Offline automatic tagging: Recognize basic entities (food, guitars, animals, bikes, cars, colors) and index on the object word
   - [ ] Search similar images, to detect duplicates while sorting my collection
   - [ ] Find images with low quality, to be used when curating my camera inbox
   - [ ] OCR, index on words in the image

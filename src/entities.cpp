@@ -28,7 +28,7 @@ void read_names(Container &names, const fs::path& filename)
     }
 }
 
-void detect_objects(std::set<std::string> &detected_labels, const fs::path p)
+void detect_entities(std::set<std::string> &detected_labels, const fs::path p)
 {
     // contains words for every concept
     static auto words_filepath = find_resource("words_full_hierarchy.txt");

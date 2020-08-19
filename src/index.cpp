@@ -14,7 +14,7 @@
 
 #include "index.hpp"
 #include "location.hpp"
-#include "detect_objects.hpp"
+#include "entities.hpp"
 #include "detect_quality.hpp"
 #include "resources.hpp"
 
@@ -37,7 +37,7 @@ void index_directory_recursive(const index_opts &opts)
     auto camera_prefix(FIELD_CAMERA_PREFIX);
     auto date_prefix(FIELD_DATE_PREFIX);
     auto file_prefix(FIELD_FILE_PREFIX);
-    auto object_prefix(FIELD_OBJECT_PREFIX);
+    auto entity_prefix(FIELD_ENTITY_PREFIX);
     auto place_prefix(FIELD_PLACE_PREFIX);
 
     for (auto& p: fs::recursive_directory_iterator(opts.root)) {
@@ -89,17 +89,17 @@ void index_directory_recursive(const index_opts &opts)
             spdlog::debug("No GPS data"); 
         }
 
-        // object detection
-        if (opts.detect_objects) {
+        // entity detection
+        if (opts.detect_entities) {
             std::set<std::string> labels;
             try {
-                detect_objects(labels, p.path().string());
+                detect_entities(labels, p.path().string());
             } catch(...) {
                 std::throw_with_nested(std::runtime_error("Failed to execute image classifier"));
             }
 
             for (auto label: labels) {
-                indexer.index_text(label, 1, object_prefix);
+                indexer.index_text(label, 1, entity_prefix);
             }
         }
 
