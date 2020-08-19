@@ -16,10 +16,9 @@
 #include "gps.hpp"
 #include "detect_objects.hpp"
 #include "detect_quality.hpp"
+#include "resources.hpp"
 
 namespace iu {
-
-constexpr auto INDEX_PATH = "./index_data";
 
 namespace fs = std::filesystem;
 
@@ -27,7 +26,11 @@ extern int file_gather_metadata(const index_opts &opts, image_metadata &md, cons
 
 void index_directory_recursive(const index_opts &opts)
 {
-    Xapian::WritableDatabase db(std::string(INDEX_PATH), Xapian::DB_CREATE_OR_OPEN);
+    auto db_path = database_path();
+    fs::create_directories(db_path);
+    Xapian::WritableDatabase db(db_path.string(), Xapian::DB_CREATE_OR_OPEN);
+    spdlog::debug("Database path: {}", db_path.string());
+
     Xapian::TermGenerator indexer;
     int failed_count = 0;
 

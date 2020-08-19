@@ -6,16 +6,18 @@
 
 #include "index.hpp"
 #include "find.hpp"
+#include "resources.hpp"
 
 namespace iu {
-
-constexpr auto INDEX_PATH = "./index_data";
 
 void search(const std::string &query_str, std::function<void(const std::string)>  cb)
 {
     try {
-        std::string path(INDEX_PATH);
-        Xapian::Database db(path);
+        auto db_path = database_path();
+        fs::create_directories(db_path);
+        Xapian::Database db(db_path.string());
+        spdlog::debug("Database path: {}", db_path.string());
+
         Xapian::Enquire enquire(db);
         Xapian::QueryParser qp;
 
