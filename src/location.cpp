@@ -5,7 +5,7 @@
 #include <csv2/reader.hpp>
 #include <spdlog/spdlog.h>
 
-#include "gps.hpp"
+#include "location.hpp"
 #include "resources.hpp"
 
 namespace iu {

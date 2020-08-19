@@ -10,7 +10,7 @@ set(libiu_SOURCES
   index.cpp
   resources.cpp
   index_libexif.cpp
-  gps.cpp
+  location.cpp
   detect_objects.cpp
   detect_quality.cpp
   # opencv contrib

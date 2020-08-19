@@ -9,6 +9,7 @@
 
 #include "find.hpp"
 #include "index.hpp"
+#include "location.hpp"
 
 void print_exception(const std::exception& e, int level =  0)
 {

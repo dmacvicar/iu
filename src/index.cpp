@@ -13,7 +13,7 @@
 #include <xapian.h>
 
 #include "index.hpp"
-#include "gps.hpp"
+#include "location.hpp"
 #include "detect_objects.hpp"
 #include "detect_quality.hpp"
 #include "resources.hpp"
