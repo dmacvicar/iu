@@ -22,7 +22,10 @@ void search(const std::string &query_str, std::function<void(const std::string)>
         std::string date_prefix(FIELD_DATE_PREFIX);
         Xapian::DateRangeProcessor date_vrp(FIELD_DATE_NO, "date:");
         qp.add_rangeprocessor(&date_vrp);
-        
+
+        Xapian::NumberRangeProcessor quality_nrp(FIELD_QUALITY_NO, "quality:");
+        qp.add_rangeprocessor(&quality_nrp);
+
         std::map<std::string, std::string> fields = {{FIELD_CAMERA_NAME, FIELD_CAMERA_PREFIX},
                                                      {FIELD_DATE_NAME, FIELD_DATE_PREFIX},
                                                      {FIELD_OBJECT_NAME, FIELD_OBJECT_PREFIX},
@@ -42,6 +45,7 @@ void search(const std::string &query_str, std::function<void(const std::string)>
         spdlog::info("{} results found", result.get_matches_estimated());
         for(Xapian::MSetIterator iter = result.begin(); iter != result.end(); iter++){
             Xapian::Document doc = iter.get_document();
+            spdlog::info("doc: {}", doc.get_description());
             cb(doc.get_value(FIELD_ID_NO));
         }
 

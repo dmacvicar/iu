@@ -62,18 +62,25 @@ void index_directory_recursive(const index_opts &opts)
             indexer.index_text(term, 1, camera_prefix);
         }
 
-        // places
-        if (opts.detect_place_names && md.location) {
+        // location
+        if (md.location) {
             spdlog::debug("Location {:.2f}, {:.2f}", std::get<0>(md.location.value()), std::get<1>(md.location.value()));
             auto lat = std::get<0>(md.location.value());
             auto lon = std::get<1>(md.location.value());
-            auto maybe_text = location_text(lat, lon);
-            if (maybe_text) {
-                auto country = std::get<0>(maybe_text.value());
-                auto place = std::get<1>(maybe_text.value());
 
-                indexer.index_text(country, 1, place_prefix);
-                indexer.index_text(place, 1, place_prefix);
+            Xapian::LatLongCoords coords;
+            coords.append(Xapian::LatLongCoord(lat, lon));
+            doc.add_value(FIELD_LOCATION_NO, coords.serialise());
+            // reverse geolocation to text
+            if (opts.detect_place_names) {
+                auto maybe_text = location_text(lat, lon);
+                if (maybe_text) {
+                    auto country = std::get<0>(maybe_text.value());
+                    auto place = std::get<1>(maybe_text.value());
+
+                    indexer.index_text(country, 1, place_prefix);
+                    indexer.index_text(place, 1, place_prefix);
+                }
             }
         } else {
             spdlog::debug("No GPS data"); 
@@ -93,17 +100,14 @@ void index_directory_recursive(const index_opts &opts)
             }
         }
 
-        // blurry images
+        // image quality: 0 best, 100 worst
         try {
-            auto blurry = detect_quality(p.path().string());
-
-            spdlog::error("Blurry: {}", blurry);
-            if (blurry > 60) {
-                indexer.index_text("blurry", 1, "");
-            }
+            auto quality = detect_quality(p.path().string());
+            spdlog::error("quality: {}", quality);
+            doc.add_value(FIELD_QUALITY_NO, Xapian::sortable_serialise(quality));
 
         } catch(...) {
-            std::throw_with_nested(std::runtime_error("Failed to execute image blurry classifier"));
+            std::throw_with_nested(std::runtime_error("Failed to execute image quality classifier"));
         }
 
         // date
