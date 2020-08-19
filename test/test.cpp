@@ -1,7 +1,7 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
-#include "gps.hpp"
+#include "location.hpp"
 
 using Catch::WithinAbs;
 
