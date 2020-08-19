@@ -72,7 +72,7 @@ void detect_objects(std::set<std::string> &detected_labels, const fs::path p)
         auto label_terms = labels[sorted_idx.at<int>(i)];
 
         spdlog::debug("{} - probability: {}", label_terms, probability);
-        if (probability < 0.48) {
+        if (probability < 0.40) {
             continue;
         }
         // every class has multiple words separated by comma
