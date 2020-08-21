@@ -11,7 +11,7 @@ set(libiu_SOURCES
   resources.cpp
   index_libexif.cpp
   location.cpp
-  detect_objects.cpp
+  entities.cpp
   detect_quality.cpp
   # opencv contrib
   ${CMAKE_BINARY_DIR}/_deps/opencv_contrib-src/modules/quality/src/qualitybrisque.cpp

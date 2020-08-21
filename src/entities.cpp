@@ -8,7 +8,7 @@
 #include <csv2/reader.hpp>
 
 #include "resources.hpp"
-#include "detect_objects.hpp"
+#include "entities.hpp"
 
 namespace iu {
 

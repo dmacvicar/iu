@@ -90,7 +90,7 @@ void index_directory_recursive(const index_opts &opts)
         }
 
         // entity detection
-        if (opts.detect_entities) {
+        if (opts.index_entity_names) {
             std::set<std::string> labels;
             try {
                 detect_entities(labels, p.path().string());
