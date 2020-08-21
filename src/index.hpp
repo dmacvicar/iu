@@ -19,7 +19,7 @@ struct image_metadata {
 
 constexpr auto FIELD_CAMERA_PREFIX = "C";
 constexpr auto FIELD_ENTITY_PREFIX = "XE";
-constexpr auto FIELD_PLACE_PREFIX = "P";
+constexpr auto FIELD_PLACE_PREFIX = "XP";
 constexpr auto FIELD_FILE_PREFIX = "Q";
 constexpr auto FIELD_DATE_PREFIX = "D";
 constexpr auto FIELD_QUALITY_PREFIX = "XQ";

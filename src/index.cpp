@@ -75,7 +75,7 @@ void index_directory_recursive(const index_opts &opts)
             coords.append(Xapian::LatLongCoord(lat, lon));
             doc.add_value(FIELD_LOCATION_NO, coords.serialise());
             // reverse geolocation to text
-            if (opts.detect_place_names) {
+            if (opts.index_location_names) {
                 auto maybe_text = location_text(lat, lon);
                 if (maybe_text) {
                     auto country = std::get<0>(maybe_text.value());

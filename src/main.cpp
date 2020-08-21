@@ -77,7 +77,9 @@ int main(int argc, char* argv[])
                                       });
                 }
             } else if (subcom == locations) {
-                
+                iu::all_locations([](const std::string &result) {
+                                      std::cout << result << std::endl;
+                                  });
             }
         }
     }

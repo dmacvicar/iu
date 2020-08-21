@@ -1,10 +1,14 @@
 #include <cmath>
+#include <cctype>
 #include <filesystem>
 #include <optional>
+
+#include <xapian.h>
 
 #include <csv2/reader.hpp>
 #include <spdlog/spdlog.h>
 
+#include "index.hpp"
 #include "location.hpp"
 #include "resources.hpp"
 
@@ -134,6 +138,29 @@ std::optional<std::tuple<std::string, std::string>> location_text(double lat, do
     auto place = std::get<3>(*closest_entry);
     spdlog::debug("Photo taken near {}, {} ({:.2f} km)", place, country->second, *min);
     return std::make_tuple(country->second, place);
+}
+
+static std::string capitalize(const std::string s) {
+    std::string ret(s);
+    char last = ' ';
+    for (std::string::iterator it = ret.begin(); it != ret.end(); ++it) {
+        *it = std::isspace(last) ? std::toupper(*it) : *it;
+        last = *it;
+    }
+    return ret;
+}
+
+void all_locations(std::function<void(const std::string)> cb) {
+    auto db_path = database_path();
+    Xapian::Database db(db_path.string());
+    spdlog::debug("Database path: {}", db_path.string());
+
+    auto it = db.allterms_begin(FIELD_PLACE_PREFIX);
+    auto end = db.allterms_end(FIELD_PLACE_PREFIX);
+    for (; it != end; ++it) {
+        // remove xapian term prefix and capitalize
+        cb(capitalize((*it).substr(std::strlen(FIELD_PLACE_PREFIX), std::string::npos)));
+    }
 }
 
 } // namespace iu
