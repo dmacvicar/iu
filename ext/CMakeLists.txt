@@ -1,17 +1,20 @@
 include(FetchContent)
 
+# Command line parsing
 FetchContent_Declare(cli11
   GIT_REPOSITORY https://github.com/CLIUtils/CLI11
   GIT_SHALLOW ON
 )
 FetchContent_MakeAvailable(cli11)
 
+# Formatting library (also used by spdlog)
 FetchContent_Declare(fmt
   GIT_REPOSITORY https://github.com/fmtlib/fmt
   GIT_SHALLOW ON
 )
 FetchContent_MakeAvailable(fmt)
 
+# Logging library
 FetchContent_Declare(spdlog
   URL https://github.com/gabime/spdlog/archive/v1.5.0.tar.gz
   URL_HASH SHA256=b38e0bbef7faac2b82fed550a0c19b0d4e7f6737d5321d4fd8f216b80f8aee8a
@@ -19,60 +22,24 @@ FetchContent_Declare(spdlog
 FetchContent_MakeAvailable(spdlog)
 add_definitions(-DSPDLOG_FMT_EXTERNAL)
 
+# CSV2 parser
 FetchContent_Declare(csv2
   GIT_REPOSITORY https://github.com/p-ranav/csv2.git
   GIT_SHALLOW ON
 )
 FetchContent_MakeAvailable(csv2)
 
+# Test library
 FetchContent_Declare(catch2
   GIT_REPOSITORY https://github.com/catchorg/Catch2
   GIT_SHALLOW ON
 )
 FetchContent_MakeAvailable(catch2)
 
-# We depend only on the data files
-FetchContent_Declare(reverse_geocode
-  GIT_REPOSITORY https://github.com/richardpenman/reverse_geocode
-  GIT_SHALLOW ON
-)
-FetchContent_MakeAvailable(reverse_geocode)
-
+# Quality (BRISQUE) opencv module and the model included in samples
 FetchContent_Declare(opencv_contrib
   GIT_REPOSITORY https://github.com/opencv/opencv_contrib.git
   GIT_SHALLOW ON
-#  SOURCE_SUBDIR modules/quality
 )
 FetchContent_MakeAvailable(opencv_contrib)
-
-add_custom_command(
-  OUTPUT
-  ${CMAKE_BINARY_DIR}/bvlc_googlenet.prototxt
-  ${CMAKE_BINARY_DIR}/bvlc_googlenet.caffemodel
-  ${CMAKE_BINARY_DIR}/coutries.csv
-  ${CMAKE_BINARY_DIR}/geocode.csv
-  ${CMAKE_BINARY_DIR}/words.txt
-  ${CMAKE_BINARY_DIR}/wordnet.is_a.txt
-  COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/download_data.cmake
-  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-)
-
-find_package(Python3)
-add_custom_command(
-  OUTPUT ${CMAKE_BINARY_DIR}/words_full_hierarchy.txt
-  COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/generate.py --output ${CMAKE_BINARY_DIR}/words_full_hierarchy.txt
-  DEPENDS ${CMAKE_BINARY_DIR}/words.txt ${CMAKE_BINARY_DIR}/wordnet.is_a.txt
-  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-)
-
-add_custom_target(data
-  DEPENDS
-  ${CMAKE_BINARY_DIR}/words_full_hierarchy.txt
-  ${CMAKE_BINARY_DIR}/bvlc_googlenet.prototxt
-  ${CMAKE_BINARY_DIR}/bvlc_googlenet.caffemodel
-  ${CMAKE_BINARY_DIR}/geocode.csv
-  ${CMAKE_BINARY_DIR}/countries.csv
-  ${CMAKE_BINARY_DIR}/wordnet.is_a.txt
-  ${CMAKE_BINARY_DIR}/words.txt
-)
 
