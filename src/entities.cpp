@@ -41,7 +41,12 @@ void detect_entities(std::set<std::string> &detected_labels, const fs::path p)
         throw std::runtime_error("Can't find model data, used for image classification");
     }
 
-    static cv::dnn::Net net = cv::dnn::readNet(*model_filepath, "bvlc_googlenet.prototxt");
+    static auto model_config_filepath = find_resource("bvlc_googlenet.prototxt");
+    if (!model_config_filepath) {
+        throw std::runtime_error("Can't find model config, used for image classification");
+    }
+
+    static cv::dnn::Net net = cv::dnn::readNet(*model_filepath, *model_config_filepath);
     if (net.empty()) {
         throw std::runtime_error(fmt::format("Loaded network '{}' has no layers", (*model_filepath).string()));
     }
