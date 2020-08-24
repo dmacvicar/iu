@@ -39,6 +39,9 @@ void search(const std::string &query_str, std::function<void(const std::string)>
         }
 
         Xapian::Query query = qp.parse_query(query_str);
+        if (query_str.empty()) {
+            query = Xapian::Query::MatchAll;
+        }
         spdlog::debug("Query: {}", query.get_description());
 
         enquire.set_query(query);
