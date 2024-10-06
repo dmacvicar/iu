@@ -2,7 +2,8 @@ include(FetchContent)
 # Reverse geolocation data files (.csv)
 FetchContent_Declare(reverse_geocode
   GIT_REPOSITORY https://github.com/richardpenman/reverse_geocode
-  GIT_SHALLOW ON
+  # just before move from csv to json
+  GIT_TAG "6e2e67e"
 )
 FetchContent_MakeAvailable(reverse_geocode)
 FetchContent_GetProperties(reverse_geocode
@@ -30,7 +31,7 @@ add_custom_command(
   ${CMAKE_CURRENT_BINARY_DIR}/bvlc_googlenet.caffemodel
   ${CMAKE_CURRENT_BINARY_DIR}/brisque_model_live.yml
   ${CMAKE_CURRENT_BINARY_DIR}/brisque_range_live.yml
-  ${CMAKE_CURRENT_BINARY_DIR}/coutries.csv
+  ${CMAKE_CURRENT_BINARY_DIR}/countries.csv
   ${CMAKE_CURRENT_BINARY_DIR}/geocode.csv
   ${CMAKE_CURRENT_BINARY_DIR}/words.txt
   ${CMAKE_CURRENT_BINARY_DIR}/wordnet.is_a.txt

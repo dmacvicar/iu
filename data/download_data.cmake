@@ -1,7 +1,7 @@
 message(STATUS "Copying geocode data to ${CMAKE_CURRENT_BINARY_DIR}")
 file(COPY
-  ${REVERSE_GEOCODE_SOURCE_DIR}/geocode.csv
-  ${REVERSE_GEOCODE_SOURCE_DIR}/countries.csv
+  ${REVERSE_GEOCODE_SOURCE_DIR}/reverse_geocode/geocode.csv
+  ${REVERSE_GEOCODE_SOURCE_DIR}/reverse_geocode/countries.csv
   DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
 )
 
@@ -31,12 +31,12 @@ file(DOWNLOAD https://raw.githubusercontent.com/opencv/opencv_extra/master/testd
 )
 
 message(STATUS "Downloading image-net words.txt & wordnet.is_a.txt")
-file(DOWNLOAD http://www.image-net.org/archive/words.txt
+file(DOWNLOAD http://www.image-net.org/data/words.txt
   ${CMAKE_CURRENT_BINARY_DIR}/words.txt
-  EXPECTED_HASH SHA256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  EXPECTED_HASH SHA256=55df3c6ee75859de344e2834ef65d88d61cec389d57e787be59e942c9b73e9aa
   SHOW_PROGRESS
 )
-file(DOWNLOAD http://www.image-net.org/archive/wordnet.is_a.txt
+file(DOWNLOAD http://www.image-net.org/data/wordnet.is_a.txt
   ${CMAKE_CURRENT_BINARY_DIR}/wordnet.is_a.txt
   EXPECTED_HASH SHA256=ff7206572ae989d1de8acbd6cbd921854fefd32dcdcb50eab11b81e797e28cd1
   SHOW_PROGRESS
