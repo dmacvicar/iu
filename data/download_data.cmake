@@ -33,7 +33,7 @@ file(DOWNLOAD https://raw.githubusercontent.com/opencv/opencv_extra/master/testd
 message(STATUS "Downloading image-net words.txt & wordnet.is_a.txt")
 file(DOWNLOAD http://www.image-net.org/archive/words.txt
   ${CMAKE_CURRENT_BINARY_DIR}/words.txt
-  EXPECTED_HASH SHA256=55df3c6ee75859de344e2834ef65d88d61cec389d57e787be59e942c9b73e9aa
+  EXPECTED_HASH SHA256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
   SHOW_PROGRESS
 )
 file(DOWNLOAD http://www.image-net.org/archive/wordnet.is_a.txt

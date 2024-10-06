@@ -16,8 +16,9 @@ FetchContent_MakeAvailable(fmt)
 
 # Logging library
 FetchContent_Declare(spdlog
-  URL https://github.com/gabime/spdlog/archive/v1.5.0.tar.gz
-  URL_HASH SHA256=b38e0bbef7faac2b82fed550a0c19b0d4e7f6737d5321d4fd8f216b80f8aee8a
+  URL https://github.com/gabime/spdlog/archive/v1.14.1.tar.gz
+  URL_HASH SHA256=1586508029a7d0670dfcb2d97575dcdc242d3868a259742b69f100801ab4e16b
+  DOWNLOAD_EXTRACT_TIMESTAMP ON
 )
 FetchContent_MakeAvailable(spdlog)
 add_definitions(-DSPDLOG_FMT_EXTERNAL)
@@ -33,6 +34,7 @@ FetchContent_MakeAvailable(csv2)
 FetchContent_Declare(catch2
   GIT_REPOSITORY https://github.com/catchorg/Catch2
   GIT_SHALLOW ON
+  GIT_TAG "v3.7.1"
 )
 FetchContent_MakeAvailable(catch2)
 

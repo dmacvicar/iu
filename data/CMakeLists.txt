@@ -17,6 +17,7 @@ FetchContent_GetProperties(opencv_contrib
 FetchContent_Declare(ilsvrc12
   URL http://dl.caffe.berkeleyvision.org/caffe_ilsvrc12.tar.gz
   URL_HASH SHA256=e35c0c1994a21f7d8ed49d01881ce17ab766743d3b0372cdc0183ff4d0dfc491
+  DOWNLOAD_EXTRACT_TIMESTAMP ON
 )
 FetchContent_MakeAvailable(ilsvrc12)
 FetchContent_GetProperties(ilsvrc12
