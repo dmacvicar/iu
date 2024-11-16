@@ -123,6 +123,27 @@ static int gather_exif_data(const index_opts &opts, image_metadata &md, ExifData
         }
     }
 
+    {
+        std::array<char, 2000> buf;
+        ExifEntry *e = exif_data_get_entry(d, EXIF_TAG_IMAGE_WIDTH);
+        const char *s = exif_entry_get_value(e, buf.data(), buf.size());
+        if (!s) {
+            spdlog::debug("Can't get value from entry for tag {}", exif_tag_get_name(EXIF_TAG_IMAGE_WIDTH));
+            return -1;
+        }
+        md.width = strtol(s, nullptr, 10);
+
+        e = exif_data_get_entry(d, EXIF_TAG_IMAGE_LENGTH);
+        s = exif_entry_get_value(e, buf.data(), buf.size());
+        if (!s) {
+            spdlog::debug("Can't get value from entry for tag {}", exif_tag_get_name(EXIF_TAG_IMAGE_LENGTH));
+            return -1;
+        }
+        md.height = strtol(s, nullptr, 10);
+        spdlog::info("Size: {}x{}", *md.width, *md.height);
+
+    }
+    
     return 0;
 }
 

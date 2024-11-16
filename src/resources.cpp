@@ -44,6 +44,12 @@ std::optional<fs::path> find_resource(const std::string &name) {
     if (fs::exists(right_here)) {
         return right_here;
     }
+
+    auto data = fs::current_path() / "data" / name;
+    if (fs::exists(data)) {
+        return data;
+    }
+
     // TODO later also lookup in system data dir
     return std::nullopt;
 }

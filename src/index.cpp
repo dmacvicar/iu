@@ -17,6 +17,7 @@
 #include "entities.hpp"
 #include "detect_quality.hpp"
 #include "resources.hpp"
+#include "ai.hpp"
 
 namespace iu {
 
@@ -38,7 +39,12 @@ void index_directory_recursive(const index_opts &opts)
     auto date_prefix(FIELD_DATE_PREFIX);
     auto file_prefix(FIELD_FILE_PREFIX);
     auto entity_prefix(FIELD_ENTITY_PREFIX);
+    auto ai_prefix(FIELD_AI_PREFIX);
     auto place_prefix(FIELD_PLACE_PREFIX);
+
+    if (opts.index_ai) {
+        ai_init(opts);
+    }
 
     for (auto& p: fs::recursive_directory_iterator(opts.root)) {
         std::string ext(p.path().extension());
@@ -47,6 +53,13 @@ void index_directory_recursive(const index_opts &opts)
         if (ext != ".jpg" && ext != ".jpeg") {
             continue;
         }
+
+        // skip hidden files
+        if (p.path().has_filename() && p.path().filename().string()[0] == '.') {
+            spdlog::debug("skip hidden file: {}", p.path().string());
+            continue;
+        }
+
         spdlog::debug("processing: {}", p.path().string());
 
         Xapian::Document doc;
@@ -100,6 +113,20 @@ void index_directory_recursive(const index_opts &opts)
 
             for (auto label: labels) {
                 indexer.index_text(label, 1, entity_prefix);
+            }
+        }
+
+        // AI vision
+        if (opts.index_ai) {
+            std::set<std::string> labels;
+            try {
+                ai_describe_image(opts, labels, p.path().string());
+            } catch(...) {
+                std::throw_with_nested(std::runtime_error("Failed to execute AI vision"));
+            }
+
+            for (auto label: labels) {
+                indexer.index_text(label, 1, ai_prefix);
             }
         }
 

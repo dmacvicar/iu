@@ -1,7 +1,10 @@
+#include <unistd.h>
+
 #include <iostream>
 #include <string>
 #include <vector>
 #include <numeric>
+#include <filesystem>
 
 #include <CLI/CLI.hpp>
 #include <spdlog/spdlog.h>
@@ -10,6 +13,8 @@
 #include "find.hpp"
 #include "index.hpp"
 #include "location.hpp"
+
+namespace fs = std::filesystem;
 
 void print_exception(const std::exception& e, int level =  0)
 {
@@ -33,6 +38,10 @@ int main(int argc, char* argv[])
     app.set_help_all_flag("--help-all", "Expand all help");
     auto *debug = app.add_flag("-d,--debug", "Debug mode");
 
+    std::filesystem::path home = getenv("HOME");
+    app.set_config("--config",
+                   (home / ".config/iu.conf"),
+                   "Reads config file (ini)");
     CLI::App *index = app.add_subcommand("index", "Index images");
     CLI::App *find = app.add_subcommand("find", "Query the image database");
     CLI::App *locations = app.add_subcommand("locations", "Show all locations");
@@ -45,6 +54,17 @@ int main(int argc, char* argv[])
         ->check(CLI::ExistingDirectory);
 
     index->add_flag("-e,--index-entities,!--skip-index-entities", index_opts.index_entity_names, "Index entities despicted in pictures");
+
+    auto ai_group = index->add_option_group("AI", "AI vision on images");
+    ai_group->add_flag("--ai,!--skip-ai", index_opts.index_ai, "Index picture description using AI");
+    ai_group->add_option("--ai-base-url", index_opts.ai_base_url, "openAI compatible end-point")
+        ->needs("--ai");
+    ai_group->add_option("--ai-api-key", index_opts.ai_api_key, "openAI compatible end-point access key")
+        ->needs("--ai");
+
+    ai_group->add_option("--ai-model", index_opts.ai_model, "Model name")
+        ->needs("--ai");
+
     index->add_flag("-d,--index-places,!--skip-index-places", index_opts.index_location_names, "Index locations by their name (places)");
 
     std::string query;
@@ -55,8 +75,12 @@ int main(int argc, char* argv[])
 
     if (debug->count() > 0) {
         spdlog::set_level(spdlog::level::debug);
+        spdlog::debug("debug logging enabled...");
     }
-    spdlog::debug("debug logging enabled...");
+
+    if (app.get_config_ptr()) {
+        spdlog::debug("config file used: {}", app.get_config_ptr()->as<std::string>());
+    }
 
     try {
         for (auto *const subcom : app.get_subcommands()) {

@@ -1,3 +1,7 @@
+include(FetchContent)
+FetchContent_GetProperties(opencv_contrib
+  SOURCE_DIR OPENCV_CONTRIB_SOURCE_DIR
+)
 if(TIDY)
   set(CMAKE_CXX_CLANG_TIDY
     clang-tidy;
@@ -8,13 +12,16 @@ endif()
 set(libiu_SOURCES
   find.cpp
   index.cpp
+  jpeg.cpp
   resources.cpp
   index_libexif.cpp
   location.cpp
   entities.cpp
   detect_quality.cpp
+  ai.cpp
+  base64.cpp
   # opencv contrib
-  ${CMAKE_BINARY_DIR}/_deps/opencv_contrib-src/modules/quality/src/qualitybrisque.cpp
+  ${OPENCV_CONTRIB_SOURCE_DIR}/modules/quality/src/qualitybrisque.cpp
   )
 
 add_library(libiu STATIC ${libiu_SOURCES})
@@ -44,6 +51,11 @@ message(STATUS "Xapian library status:")
 message(STATUS "    libraries: ${XAPIAN_LIBRARIES}")
 message(STATUS "    include path: ${XAPIAN_INCLUDE_DIR}")
 target_link_libraries(libiu ${XAPIAN_LIBRARIES})
+pkg_check_modules(LIBCURL REQUIRED IMPORTED_TARGET libcurl)
+message(STATUS "CURL library status:")
+message(STATUS "    libraries: ${LIBCURL_LIBRARIES}")
+message(STATUS "    include path: ${LIBCURL_INCLUDE_DIRS}")
+target_link_libraries(libiu ${LIBCURL_LIBRARIES})
 
 add_executable(iu
   main.cpp
@@ -52,6 +64,8 @@ set_target_properties(iu PROPERTIES
   CXX_STANDARD 17
 )
 target_link_libraries(iu libiu)
+target_link_libraries(iu PRIVATE libiu)
+add_dependencies(iu data)
 
 include_directories(${CLI11_SOURCE_DIR}/include)
 include_directories(${FMT_SOURCE_DIR}/include)
@@ -62,4 +76,6 @@ include_directories(${XAPIAN_INCLUDE_DIR})
 include_directories(${LIBEXIF_INCLUDEDIR})
 # opencv module quality
 include_directories(${CMAKE_BINARY_DIR}/_deps/opencv_contrib-src/modules/quality/include)
+include_directories(${OPENCV_CONTRIB_SOURCE_DIR}/modules/quality/include)
+include_directories(${openaicpp_SOURCE_DIR}/include/openai)
 

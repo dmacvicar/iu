@@ -3,6 +3,7 @@ include(FetchContent)
 # Command line parsing
 FetchContent_Declare(cli11
   GIT_REPOSITORY https://github.com/CLIUtils/CLI11
+  GIT_TAG "main"
   GIT_SHALLOW ON
 )
 FetchContent_MakeAvailable(cli11)
@@ -45,3 +46,11 @@ FetchContent_Declare(opencv_contrib
 )
 FetchContent_MakeAvailable(opencv_contrib)
 
+# openAI compatible API client
+FetchContent_Declare(openaicpp
+  GIT_REPOSITORY https://github.com/olrea/openai-cpp
+  GIT_TAG "main"
+  GIT_SHALLOW ON
+  EXCLUDE_FROM_ALL
+)
+FetchContent_MakeAvailable(openaicpp)
