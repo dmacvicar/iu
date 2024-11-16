@@ -63,7 +63,6 @@ add_executable(iu
 set_target_properties(iu PROPERTIES
   CXX_STANDARD 17
 )
-target_link_libraries(iu libiu)
 target_link_libraries(iu PRIVATE libiu)
 add_dependencies(iu data)
 
