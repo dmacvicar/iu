@@ -31,6 +31,7 @@ jobs:
         sudo apt-get install libxapian-dev
         sudo apt-get install libexif-dev
         sudo apt-get install libopencv-dev
+        sudo apt-get install libcurl-dev
         sudo apt-get install ninja-build
     - if: ${{ runner.os == 'macOS' }}
       name: Install package dependencies (macOS)
